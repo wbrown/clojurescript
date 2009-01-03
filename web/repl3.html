@@ -1,0 +1,221 @@
+<!--
+Copyright (c) 2013 Joel Martin
+Copyright (c) 2012 Fogus, Jen Myers and Relevance Inc.
+All rights reserved. The use and distribution terms for this software
+are covered by the Eclipse Public License 1.0
+(http://opensource.org/licenses/eclipse-1.0.php) which can be found in
+the file COPYING the root of this distribution.  By using this
+software in any fashion, you are agreeing to be bound by the terms of
+this license.  You must not remove this notice, or any other, from
+this software.
+-->
+
+<html>
+<head>
+  <!--<script type="text/javascript" src="javascript/jquery-1.4.2.min.js"></script>-->
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+  <script type="text/javascript" src="vendor/jq-console/jqconsole.min.js"></script>
+  <script src="vendor/codemirror/lib/codemirror.js"></script>
+  <link rel="stylesheet" href="vendor/codemirror/lib/codemirror.css">
+  <script src="vendor/codemirror/mode/clojure/clojure.js"></script>
+  <script src="vendor/codemirror/addon/edit/matchbrackets.js"></script>
+  <script type="text/javascript" src="out/goog/base.js"></script>
+  <script type="text/javascript" src="webrepl3.js"></script>
+  <script type="text/javascript">
+    goog.require('webrepl');
+  </script>
+  <link rel="stylesheet" type="text/css" href="stylesheets/base.css" />
+  <link rel="stylesheet" type="text/css" href="stylesheets/layout.css" />
+  <link rel="stylesheet" type="text/css" href="stylesheets/skeleton.css" />
+  <link rel="stylesheet" type="text/css" href="stylesheets/himera.css" />
+  <style type="text/css" media="screen">
+  </style>
+  <title>ClojureScript-in-ClojureScript REPL</title>
+</head>
+<body>
+
+  <div class="container">
+    <h1 id="title"><a href="http://www.clojurescript.net"/>ClojureScript.net</a></h1>
+    
+    <h2>ClojureScript Web REPL</h2>
+
+    <div id="editor-container" class="sixteen columns">
+    <div id="tiny-note" class="tiny-note"></div>
+    <textarea class="editor" id="editor">;; Develop your clojurescript program here.
+;; Ctrl+E/Cmd+E evaluates file in the REPL.</textarea>
+    </div>
+    
+    <div id="console-container" class="sixteen columns">
+    <div class="console" id="console"></div>
+    </div>
+    <div class="eight columns">
+    <h3><span style="cursor: pointer" class="doc-link" id="toggle-editor">Show file editor</a></h3>
+    </div>
+    <div class="eight columns">
+    <div class="source">
+      <a href="http://github.com/kanaka/clojurescript">View source on Github <img src="images/github-icon.png" /></a></p>
+    </div><!-- /source -->
+    </div>
+    
+    <div class="rule sixteen columns"></div>
+
+	  <div class="sixteen columns">
+    <h3>ClojureScript at a glance - <a href="http://appletree.or.kr/quick_reference_cards/Others/ClojureScript%20Cheat%20Sheet.pdf" class="doc-link">PDF</a> | <a href="http://clojuredocs.org/" class="doc-link">Searchable docs</a> | <a href="synonym.html" class="doc-link">Translations from JavaScript</a></h3>
+    </div>
+    
+    <div class="cheat-box-container eight columns">
+      <div class="cheat-box">
+        <h4>Datatypes</h4>
+        <table>
+          <tr class="row-one">
+            <td class="row-label">Map</td>
+            <td>{:key1 :val1, :key2 :val2}</td>
+          </tr>
+          <tr>
+            <td class="row-label">Vectors</td>
+            <td>[1 2 3 4 :a :b :c 1 2]</td>
+          </tr>
+          <tr class="row-one">
+            <td class="row-label">Sets</td>
+            <td>#{:a :b :c 1 2 3}</td>
+          </tr>
+          <tr>
+            <td class="row-label">Scalars</td>
+            <td>a-symbol, :a-keyword, "a string"</td>
+          </tr>
+          <tr class="row-one">
+            <td class="row-label">Arrays</td>
+            <td>(array 1 2 3)</td>
+          </tr>
+        </table>
+      </div><!-- /cheat-box -->
+      <div class="cheat-box">
+        <h4>Functions</h4>
+        <table>
+          <tr class="row-one">
+            <td class="row-label">Calling</td>
+            <td>(<span class="ebnf">&lt;function&gt;</span>
+	         <span class="ebnf">&lt;args*&gt;</span>)</td>
+          </tr>
+          <tr>
+            <td class="row-label">Defining named functions</td>
+            <td>(defn <span class="ebnf">&lt;name&gt;</span> 
+                  [<span class="ebnf">&lt;args*&gt;</span>]
+	          <span class="ebnf">|constraints|</span>
+                  <span class="ebnf">&lt;actions*&gt;</span>)</td>
+          </tr>
+          <tr class="row-one">
+            <td class="row-label">Anonymous function</td>
+            <td>(fn <span class="ebnf">|name|</span>
+                  [<span class="ebnf">&lt;args*&gt;</span>]
+	          <span class="ebnf">|constraints|</span> 
+                  <span class="ebnf">&lt;actions*&gt;</span>)</td>
+          </tr>
+          <tr>
+            <td class="row-label">Anonymous inline function</td>
+            <td>#(<span class="ebnf">&lt;action&gt;</span>
+	          <span class="ebnf">|%,%2,%3, or %&|</span>)</td>
+          </tr>
+        </table>
+      </div><!-- /cheat-box -->
+      <div class="cheat-box">
+        <h4>Useful Macros</h4>
+        <table>
+          <tr class="row-one">
+            <td class="row-label">Conditionals</td>
+            <td>if if-let cond condp and or when when-let</td>
+          </tr>
+          <tr>
+            <td class="row-label">Nesting, chaining, and Interop</td>
+            <td>-> ->> doto .. .</td>
+          </tr>
+          <tr class="row-one">
+            <td class="row-label">Defining things</td>
+            <td>def defn fn let binding defmulti defmethod deftype defrecord reify this-as</td>
+          </tr>
+	</table>
+      </div>
+    </div><!-- /cheat-box-container -->
+
+    <div class="cheat-box-container eight columns">
+      <div class="cheat-box">
+        <h4>Useful Functions</h4>
+        <table>
+          <tr class="row-one">
+            <td class="row-label">Math</td>
+            <td>+ - * / quot rem mod inc dec max min</td>
+          </tr>
+          <tr>
+            <td class="row-label">Comparison</td>
+            <td>= == not= < > <= >=</td>
+          </tr>
+          <tr class="row-one">
+            <td class="row-label">Predicates</td>
+            <td>nil? identical? zero? pos? neg? even? odd? true? false?</td>
+          </tr>
+          <tr>
+            <td class="row-label">Data processing</td>
+            <td>map reduce filter partition split-at split-with</td>
+          </tr>
+          <tr class="row-one">
+            <td class="row-label">Data create</td>
+            <td>vector vec hash-map set for list list*</td>
+          </tr>
+          <tr>
+            <td class="row-label">Data inspection</td>
+            <td>first rest get get-in keys vals count get nth contains? find</td>
+          </tr>
+          <tr class="row-one">
+            <td class="row-label">Data manipulation</td>
+            <td>seq into conj cons assoc assoc-in dissoc zipmap merge merge-with select-keys update-in</td>
+          </tr>
+          <tr>
+            <td class="row-label">Arrays</td>
+            <td>first rest get get-in keys vals count get nth contains? find</td></td>
+          </tr>
+        </table>
+      </div><!-- /cheat-box -->
+      <div class="cheat-box">
+        <h4>JavaScript Interop</h4>
+        <table>
+          <tr class="row-one">
+            <td class="row-label">Method call</td>
+            <td>(.the-method target-object args...)</td>
+          </tr>
+          <tr>
+            <td class="row-label">Property access</td>
+            <td>(.-property target-object -property)</td>
+          </tr>
+          <tr class="row-one">
+            <td class="row-label">Property setting</td>
+            <td>(set! (.-title js/document) "Hi!")</td>
+          </tr>
+          <tr>
+            <td class="row-label">Direct JavaScript</td>
+            <td>(js/alert "Hello Cleveland!")</td>
+          </tr>
+          <tr class="row-one">
+            <td class="row-label">External library use</td>
+            <td>(.text (js/jQuery "#title") "ClojureScript Rocks!")</td>
+          </tr>
+	</table>
+      </div>
+    </div><!-- /cheat-box-container -->
+        
+    <div class="rule sixteen columns"></div>
+    
+    <div class="column footer-logo">
+        <div>Cljs-in-Cljs &copy; 2013 Joel Martin</div>
+        <div>Himera design &copy; 2012-2013 <a ref="http://www.fogus.me">Fogus</a>, <a href="http://jenmyers.net/">Jen Myers</a> and <a href="http://www.thinkrelevance.com">Relevance Inc.</a></div>
+    </div>
+    
+    <ul class="footer-links">
+      <li><a href="http://clojure.org/">Clojure.org</a></li>
+      <li><a href="https://github.com/kanaka/clojurescript">Cljs-in-Cljs</a></li>
+      <li><a href="https://github.com/clojure/clojurescript">ClojureScript</a></li>
+      <li><a href="http://clojuredocs.org/">Clojure Docs</a></li>
+    </ul>
+
+  </div><!-- / container -->
+</body>
+</html>
