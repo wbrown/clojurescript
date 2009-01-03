@@ -3,4 +3,4 @@
 	url = https://github.com/replit/jq-console
 [submodule "web/vendor/codemirror"]
 	path = web/vendor/codemirror
-	url = https://github.com/marijnh/CodeMirror.git
+	url = https://github.com/marijnh/CodeMirror
