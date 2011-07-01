@@ -269,17 +269,17 @@ goog.require = function(rule){Packages.clojure.lang.RT[\"var\"](\"cljs.compiler\
       (println (str "goog.exportSymbol('" export "', " name ");")))))
 
 (defn emit-fn-method
-  [{:keys [gthis name variadic params statements ret env recurs]}]
+  [{:keys [gthis name variadic params statements ret env recurs single]}]
   (emit-wrap env
              (print (str "(function " name "(" (comma-sep
-                                                (if variadic
-                                                  (concat (butlast params) ['var_args])
+                                                (if (and variadic single)
+                                                  (concat (butlast params)
+                                                          ['var_args])
                                                   params)) "){\n"))
+             (when (and variadic single)
+               (println (str "var " (last params) " = cljs.core.array_seq(Array.prototype.slice.call(arguments, 0), 0);")))
              (when gthis
                (println (str "var " gthis " = this;")))
-             (when variadic
-               (println (str "var " (last params) " = cljs.core.array_seq(Array.prototype.slice.call(arguments, " (dec (count params)) "),0);"))
-               #_(println (str (last params) " = Array.prototype.slice.call(arguments, " (dec (count params)) ");")))
              (when recurs (print "while(true){\n"))
              (emit-block :return statements ret)
              (when recurs (print "break;\n}\n"))
@@ -303,7 +303,7 @@ goog.require = function(rule){Packages.clojure.lang.RT[\"var\"](\"cljs.compiler\
     (when (< 1 (count params))
       (print ")"))
     (println ";")
-    (println (str "return " name ".call(" (string/join ", " (cons 'this params)) ");"))
+    (println (str "return " name ".call(" (comma-sep (cons 'this params)) ");"))
     (print "})")))
 
 (defmethod emit :fn
@@ -311,7 +311,7 @@ goog.require = function(rule){Packages.clojure.lang.RT[\"var\"](\"cljs.compiler\
   ;;fn statements get erased, serve no purpose and can pollute scope if named
   (when-not (= :statement (:context env))
     (if (= 1 (count methods))
-      (emit-fn-method (assoc (first methods) :name name))
+      (emit-fn-method (assoc (first methods) :name name :single true))
       (let [name (or name (gensym))
             maxparams (apply max-key count (map :params methods))
             mmap (zipmap (repeatedly #(gensym (str name  "__"))) methods)
@@ -322,16 +322,16 @@ goog.require = function(rule){Packages.clojure.lang.RT[\"var\"](\"cljs.compiler\
         (println (str "var " name " = null;"))
         (doseq [[n meth] ms]
           (println (str "var " n " = " (with-out-str (emit-fn-method meth)) ";")))
-        (println (str name " = function(" (comma-sep (if variadic
-                                                       (concat (butlast maxparams) ['var_args])
-                                                       maxparams)) "){"))
-        (when variadic
-          (println (str "var " (last maxparams) " = var_args;")))
+        (println (str name " = function(" (comma-sep
+                                           (if variadic
+                                             (concat (butlast maxparams) ['var_args])
+                                             maxparams)) "){"))
         (println "switch(arguments.length){")
         (doseq [[n meth] ms]
           (if (:variadic meth)
             (do (println "default:")
-                (println (str "return " n ".apply(this,arguments);")))
+                (println (str "var " (last maxparams) " = cljs.core.array_seq(Array.prototype.slice.call(arguments, " (dec (count maxparams)) "),0);"))
+                (println (str "return " n ".call(this" (str "," (comma-sep maxparams)) ");")))
             (let [pcnt (count (:params meth))]
               (println "case " pcnt ":")
               (println (str "return " n ".call(this" (if (zero? pcnt) nil
