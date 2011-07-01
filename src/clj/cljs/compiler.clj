@@ -289,29 +289,50 @@ goog.require = function(rule){Packages.clojure.lang.RT[\"var\"](\"cljs.compiler\
   [{:keys [name params env]}]
   (let [arglist (gensym "arglist__")]
     (println (str "(function (" arglist "){"))
-    (doseq [[i param] (map-indexed vector (butlast params))]
-      (print (str "var " param " = cljs.core.first("))
-      (dotimes [_ i] (print "cljs.core.next("))
-      (print (str arglist ")"))
-      (dotimes [_ i] (print ")"))
-      (println ";"))
-    (when (< 1 (count params))
-      (print (str "var " (last params) " = cljs.core.rest(")))
-    (dotimes [_ (- (count params) 2)] (print "cljs.core.next("))
-    (print arglist)
-    (dotimes [_ (- (count params) 2)] (print ")"))
-    (when (< 1 (count params))
-      (print ")"))
-    (println ";")
+    (if (= 1 (count params))
+      (println (str "var " (first params) " = " arglist ";"))
+      (do
+        (doseq [[i param] (map-indexed vector (butlast params))]
+          (print (str "var " param " = cljs.core.first("))
+          (dotimes [_ i] (print "cljs.core.next("))
+          (print (str arglist ")"))
+          (dotimes [_ i] (print ")"))
+          (println ";"))
+        (when (< 1 (count params))
+          (print (str "var " (last params) " = cljs.core.rest(")))
+        (dotimes [_ (- (count params) 2)] (print "cljs.core.next("))
+        (print arglist)
+        (dotimes [_ (- (count params) 2)] (print ")"))
+        (when (< 1 (count params))
+          (print ")"))
+        (println ";")))
     (println (str "return " name ".call(" (comma-sep (cons 'this params)) ");"))
     (print "})")))
+
+(defn emit-single-method
+  [{:keys [gthis name variadic params statements ret env recurs]
+    :as meth}]
+  (if (= :return (:context env))
+    (println "return (function(){")
+    (println "(function(){"))
+  (println (str "var " name " = " (with-out-str (emit-fn-method
+                                                 (assoc-in meth [:env :context]
+                                                           :expr))) ";"))
+  (when variadic
+    (println (str name ".cljs$lang$maxFixedArity = " (dec (count params)) ";"))
+    (println (str name ".cljs$lang$applyTo = "
+                  (with-out-str (emit-apply-to meth)) ";")))
+  (println (str "return " name ";"))
+  (print "})()"))
 
 (defmethod emit :fn
   [{:keys [name env methods max-fixed-arity variadic]}]
   ;;fn statements get erased, serve no purpose and can pollute scope if named
   (when-not (= :statement (:context env))
     (if (= 1 (count methods))
-      (emit-fn-method (assoc (first methods) :name name :single true))
+      (emit-single-method (assoc (first methods)
+                            :name (or name (gensym))
+                            :single true))
       (let [name (or name (gensym))
             maxparams (apply max-key count (map :params methods))
             mmap (zipmap (repeatedly #(gensym (str name  "__"))) methods)
@@ -340,7 +361,7 @@ goog.require = function(rule){Packages.clojure.lang.RT[\"var\"](\"cljs.compiler\
         (println "throw('Invalid arity: ' + arguments.length);")
         (println "};")
         (when variadic
-          (println (str name ".cljs$lang$maxFixedArity = " max-fixed-arity))
+          (println (str name ".cljs$lang$maxFixedArity = " max-fixed-arity ";"))
           (println (str name ".cljs$lang$applyTo = "
                         (with-out-str
                           (emit-apply-to
