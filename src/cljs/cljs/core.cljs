@@ -1473,7 +1473,7 @@ reduces them without incurring seq initialization"
   ICounted
   (-count [rng] (if (= step 1)
                   (- end start)
-                  (goog.global.Math.ceil (quot (- end start) step))))
+                  (goog.global.Math.ceil (/ (- end start) step)))) ; Use quot (#67)
 
   IReduce
   (-reduce [rng] (ci-reduce rng)))
