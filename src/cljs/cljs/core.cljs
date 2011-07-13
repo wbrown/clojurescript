@@ -836,7 +836,7 @@ reduces them without incurring seq initialization"
   (reduce #(hash-combine %1 (hash %2)) (hash (first coll)) (next coll)))
 
 
-;;;;;;;;;;;;;;;; cons ;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;; list ;;;;;;;;;;;;;;;;
 (deftype List [meta first rest count]
   IWithMeta
   (-with-meta [coll meta] (List. meta first rest count))
@@ -1421,6 +1421,50 @@ reduces them without incurring seq initialization"
   "Returns a lazy sequence of x, (f x), (f (f x)) etc. f must be free of side-effects"
   {:added "1.0"}
   [f x] (cons x (lazy-seq (iterate f (f x)))))
+
+(deftype Range [meta start end step]
+  IWithMeta
+  (-with-meta [rng meta] (Range. meta start end step))
+
+  IMeta
+  (-meta [rng] meta)
+
+  ISeq
+  (-first [rng] start)
+  (-rest [rng] (Range. meta (+ start step) end step))
+
+  ICollection
+  (-conj [rng o] (cons o rng))
+
+  IEmptyableCollection
+  (-empty [rng] (with-meta cljs.core.List/EMPTY meta))
+
+  ISequential
+  IEquiv
+  (-equiv [rng other] (equiv-sequential rng other))
+
+  IHash
+  (-hash [rng] (hash-coll rng))
+
+  IIndexed
+  (-nth [rng n]
+    (if (and (<= (dec (-count rng)) n)
+             (= step 1))
+      (+ start n)
+      (+ start n step)))
+  #_(-nth [rng n not-found] -nth)
+
+  ISeqable
+  (-seq [rng] rng)
+
+  ICounted
+  (-count [rng] (if (= step 1)
+                  (- end start)
+                  (goog.global.Math.ceil (quot (- end start) step))))
+
+  IReduce
+  (-reduce [rng] (ci-reduce rng)))
+
 
 (defn interleave
   "Returns a lazy seq of the first item in each coll, then the second etc."
@@ -2266,7 +2310,10 @@ reduces them without incurring seq initialization"
       (pr-sequential pr-pair "{" ", " "}" opts coll)))
 
   Set
-  (-pr-seq [coll opts] (pr-sequential pr-seq "#{" " " "}" opts coll)))
+  (-pr-seq [coll opts] (pr-sequential pr-seq "#{" " " "}" opts coll))
+
+  Range
+  (-pr-seq [coll opts] (pr-sequential pr-seq "(" " " ")" opts coll)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Reference Types ;;;;;;;;;;;;;;;;
 
