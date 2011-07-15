@@ -1472,7 +1472,7 @@ reduces them without incurring seq initialization"
   (-nth [rng n]
     (if (< n (dec (-count rng)))
       (+ start (* n step))
-      (throw (str "Index out of bounds!"))))
+      #_(throw (str "Index out of bounds!"))))
   (-nth [rng n not-found]
     (if (< n (dec (-count rng)))
         (+ start (* n step))
