@@ -878,7 +878,7 @@ reduces them without incurring seq initialization"
 
   ISeq
   (-first [coll] first)
-  (-rest [coll] rest)
+  (-rest [coll] (if (nil? rest) () rest))
 
   IStack
   (-peek [coll] first)
