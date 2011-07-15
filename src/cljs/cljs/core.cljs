@@ -1444,7 +1444,10 @@ reduces them without incurring seq initialization"
 
   ISeq
   (-first [rng] start)
-  (-rest [rng] (Range. meta (+ start step) end step))
+  (-rest [rng]
+    (if (< (+ start step) end)
+      (Range. meta (+ start step) end step)
+      (list)))
 
   ICollection
   (-conj [rng o] (cons o rng))
@@ -1459,24 +1462,37 @@ reduces them without incurring seq initialization"
   IHash
   (-hash [rng] (hash-coll rng))
 
+  ICounted
+  (-count [rng]
+    (if (= step 1)
+      (- end start)
+      (goog.global.Math.ceil (/ (- end start) step)))) ;TODO: Use quot (#67)
+
   IIndexed
   (-nth [rng n]
-    (if (and (<= (dec (-count rng)) n)
-             (= step 1))
-      (+ start n)
-      (+ start n step)))
-  #_(-nth [rng n not-found] -nth)
+    (if (< n (dec (-count rng)))
+      (+ start (* n step))
+      (throw (str "Index out of bounds!"))))
+  (-nth [rng n not-found]
+    (if (< n (dec (-count rng)))
+        (+ start (* n step))
+        not-found))
 
   ISeqable
   (-seq [rng] rng)
 
-  ICounted
-  (-count [rng] (if (= step 1)
-                  (- end start)
-                  (goog.global.Math.ceil (/ (- end start) step)))) ; Use quot (#67)
-
   IReduce
-  (-reduce [rng] (ci-reduce rng)))
+  (-reduce [rng f]
+    (ci-reduce rng f)))
+
+(defn range
+  "Returns a lazy seq of nums from start (inclusive) to end
+  (exclusive), by step, where start defaults to 0, step to 1, and end
+  to infinity."
+  ([] (range 0 goog.global.Number/MAX_VALUE 1))
+  ([end] (range 0 end 1))
+  ([start end] (range start end 1))
+  ([start end step] (Range. nil start end step)))
 
 
 (defn interleave
@@ -1672,7 +1688,7 @@ reduces them without incurring seq initialization"
   (-reduce [v f]
     (ci-reduce array f))
   (-reduce [v f start]
-           (ci-reduce array start)))
+    (ci-reduce array start)))
 
 (set! cljs.core.Vector/EMPTY (Vector. nil (array)))
 
