@@ -1464,26 +1464,35 @@ reduces them without incurring seq initialization"
 
   ICounted
   (-count [rng]
-    (if (= step 1)
-      (- end start)
-      (goog.global.Math.ceil (/ (- end start) step)))) ;TODO: Use quot (#67)
+    (if (or (<= end start)
+            (= step 0))
+      0
+      (if (= step 1)
+        (- end start)
+        (goog.global.Math.ceil (/ (- end start) step))))) ;TODO: Use quot (#67)
 
   IIndexed
   (-nth [rng n]
-    (if (< n (dec (-count rng)))
+    (if (< n (-count rng))
       (+ start (* n step))
       #_(throw (str "Index out of bounds!"))))
   (-nth [rng n not-found]
-    (if (< n (dec (-count rng)))
+    (if (< n (-count rng))
         (+ start (* n step))
         not-found))
 
   ISeqable
-  (-seq [rng] rng)
+  (-seq [rng]
+    (if (or (= 0 step)
+            (<= end start))
+      cljs.core.List/EMPTY
+      rng))
 
   IReduce
   (-reduce [rng f]
-    (ci-reduce rng f)))
+    (ci-reduce rng f))
+  (-reduce [rng f start]
+    (ci-reduce rng f start)))
 
 (defn range
   "Returns a lazy seq of nums from start (inclusive) to end
