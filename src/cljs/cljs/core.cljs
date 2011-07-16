@@ -1175,7 +1175,9 @@ reduces them without incurring seq initialization"
        (if (. f cljs$lang$applyTo)
          (if (<= (bounded-count args fixed-arity)
                  fixed-arity)
-           (. f apply f (to-array args))
+           (if (zero? fixed-arity)
+             (. f cljs$lang$applyTo args)
+             (. f apply f (to-array args)))
            (. f cljs$lang$applyTo args))
          (. f apply f (to-array args)))))
   ([f x args]
@@ -2633,6 +2635,16 @@ reduces them without incurring seq initialization"
   (assert (= 63 (apply + 1 2 4 8 16 (list 32))))
   (assert (= 127 (apply + 1 2 4 8 16 (list 32 64))))
   (assert (= 4950 (apply + (take 100 (iterate inc 0)))))
+  (let [f  (fn [& m] (nthnext m 42))
+        f1 (fn [x & m] (nthnext (list* x m) 42))
+        f2 (fn [x y & m] (nthnext (list* x y m) 42))]
+    (assert (nil? (apply f [1 2 3])))
+    (assert (nil? (apply f1 [1 2 3])))
+    (assert (nil? (apply f2 [1 2 3])))
+    (assert (= [42 43 44] (apply f (take 45 (iterate inc 0)))))
+    (assert (= [42 43 44] (apply f1 (take 45 (iterate inc 0)))))
+    (assert (= [42 43 44] (apply f2 (take 45 (iterate inc 0)))))
+    )
   ;; apply with infinite sequence
   ;; (assert (= 3 (apply (fn [& args]
   ;;                       (+ (nth args 0)
@@ -2872,4 +2884,13 @@ reduces them without incurring seq initialization"
   )
 
 #_(goog.global/print (assoc {} :a 1))
+
+(defn a [& m] (nth (vec m) 42))
+
+(defn b [x y & m] (nth (vec m) x))
+
+(defn d
+  ([x] x)
+  ([x y] y)
+  ([x y z] (nth (vec x) y)))
 

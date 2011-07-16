@@ -300,21 +300,26 @@ goog.require = function(rule){Packages.clojure.lang.RT[\"var\"](\"cljs.compiler\
   [{:keys [name params env]}]
   (let [arglist (gensym "arglist__")]
     (println (str "(function (" arglist "){"))
+    (println (str "cljs.core.prn('in applyto of " name ", len =' + arguments.length);"))
     (doseq [[i param] (map-indexed vector (butlast params))]
       (print (str "var " param " = cljs.core.first("))
       (dotimes [_ i] (print "cljs.core.next("))
       (print (str arglist ")"))
       (dotimes [_ i] (print ")"))
       (println ";"))
-    (when (< 1 (count params))
-      (print (str "var " (last params) " = cljs.core.rest(")))
-    (dotimes [_ (- (count params) 2)] (print "cljs.core.next("))
-    (print arglist)
-    (dotimes [_ (- (count params) 2)] (print ")"))
-    (when (< 1 (count params))
-      (print ")"))
-    (println ";")
-    (println (str "return " name ".call(" (string/join ", " (cons "null" params)) ");"))
+    (if (< 1 (count params))
+      (do
+        (print (str "var " (last params) " = cljs.core.rest("))
+        (dotimes [_ (- (count params) 2)] (print "cljs.core.next("))
+        (print arglist)
+        (dotimes [_ (- (count params) 2)] (print ")"))
+        (println ");")
+        (println (str "return " name ".call(" (string/join ", " (cons "null" params)) ");")))
+      (do
+        (print (str "var " (last params) " = "))
+        (print "Array.prototype.slice.call(" arglist ", 0);")
+        (println ";")
+        (println (str "return " name ".apply(" (string/join ", " (cons "null" ["arguments"])) ");"))))
     (print "})")))
 
 (defn emit-fn-method
@@ -329,21 +334,30 @@ goog.require = function(rule){Packages.clojure.lang.RT[\"var\"](\"cljs.compiler\
              (print "})")))
 
 (defn emit-variadic-fn-method
-  [{:keys [gthis name variadic params statements ret env recurs max-fixed-arity]}]
+  [{:keys [gthis name variadic params statements ret env recurs max-fixed-arity] :as f}]
   (emit-wrap env
-             (print (str "(function " name "(" (comma-sep
-                                                (if variadic
-                                                  (concat (butlast params) ['var_args])
-                                                  params)) "){\n"))
-             (when gthis
-               (println (str "var " gthis " = this;")))
-             (when variadic
-               (println (str "var " (last params) " = cljs.core.array_seq(Array.prototype.slice.call(arguments, " (dec (count params)) "),0);"))
-               #_(println (str (last params) " = Array.prototype.slice.call(arguments, " (dec (count params)) ");")))
-             (when recurs (print "while(true){\n"))
-             (emit-block :return statements ret)
-             (when recurs (print "break;\n}\n"))
-             (print "})")))
+             (let [name (or name (gensym))]
+               (println "(function() { ")
+               (print (str "var " name " = function " ,,, "(" (comma-sep
+                                                               (if variadic
+                                                                 (concat (butlast params) ['var_args])
+                                                                 params)) "){\n"))
+               (when gthis
+                 (println (str "var " gthis " = this;")))
+               (when variadic
+                 (println (str "var " (last params) " = cljs.core.array_seq(Array.prototype.slice.call(arguments, " (dec (count params)) "),0);")))
+               (when recurs (print "while(true){\n"))
+               (emit-block :return statements ret)
+               (when recurs (print "break;\n}\n"))
+               (println "};")
+               (when variadic
+                 (println (str name ".cljs$lang$maxFixedArity = " max-fixed-arity ";"))
+                 (println (str name ".cljs$lang$applyTo = "
+                               (with-out-str
+                                 (emit-apply-to (assoc f :name name)))
+                               ";")))
+               (println (str "return " name ";"))
+               (println "})()"))))
 
 (defmethod emit :fn
   [{:keys [name env methods max-fixed-arity variadic]}]
