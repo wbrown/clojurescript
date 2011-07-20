@@ -33,10 +33,35 @@
 (defn leaders [nodes]
   (reverse (sort-by #(buzz/num-mentions (second %)) nodes)))
 
-(defn update-leaderboard [graph]
+(defn redraw-leaderboard [top-leaders]
   (do (buzz/remove-children "leaderboard-content")
-      (doseq [next-node (take 5 (leaders (seq graph)))]
+      (doseq [next-node (seq top-leaders)]
         (add-leaderboard-node next-node))))
+
+(defn- has-user-info? [graph-entry]
+  (if (:last-tweet graph-entry) true false))
+
+(defn retrieve-missing-info [users callback]
+  (let [q (apply str (interpose " OR " (map (fn [[username user-info]] (str "from:" username)) users)))]
+    (buzz/retrieve (.strobj {"q" q "rpp" 100}) callback)))
+
+(defn receive-user-info [json have-info missing-info]
+  (let [result-map (:results (js->clj json :keywordize-keys true))
+	new-tweets (reduce (fn [m tweet]
+				       (if (get m (:from_user tweet))
+					 m
+					 (assoc m (:from_user tweet) tweet)))
+				     {} result-map)]
+    (redraw-leaderboard (into have-info new-tweets))))
+
+(defn update-leaderboard [graph]
+  (let [top5 (take 5 (leaders (seq graph)))
+	have-info (filter has-user-info? top5)
+	missing-info (filter (complement has-user-info?) top5)]
+    (if (empty? missing-info)
+      (redraw-leaderboard top5)
+      (retrieve-missing-info missing-info (fn [json]
+					    (receive-user-info json have-info missing-info))))))
 
 (buzz/register :track-clicked #(buzz/remove-children "leaderboard-content"))
 (buzz/register :graph-update update-leaderboard)
