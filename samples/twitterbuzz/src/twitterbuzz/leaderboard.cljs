@@ -20,7 +20,7 @@
         text (buzz/dom-element :div {:class "tweet-text"})
         pic (buzz/dom-element :img {:src (:image-url user-info) :class "profile-pic"})
         num-mentions (buzz/dom-element "div")]
-    (do (dom/insertChildAt text (dom/htmlToDocumentFragment (:last-tweet user-info)) 0) ;; (dom/setTextContent text (:last-tweet user-info))
+    (do (dom/insertChildAt text (dom/htmlToDocumentFragment (:last-tweet user-info)) 0)
         (dom/setTextContent user-e user)
         (dom/setTextContent num-mentions (str (buzz/num-mentions user-info)))
         (dom/appendChild child pic)
@@ -39,20 +39,24 @@
         (add-leaderboard-node next-node))))
 
 (defn- has-user-info? [graph-entry]
-  (if (:last-tweet graph-entry) true false))
+  (if (:last-tweet (second graph-entry)) true false))
 
 (defn retrieve-missing-info [users callback]
   (let [q (apply str (interpose " OR " (map (fn [[username user-info]] (str "from:" username)) users)))]
     (buzz/retrieve (.strobj {"q" q "rpp" 100}) callback)))
 
-(defn receive-user-info [json have-info missing-info]
+(defn receive-user-info [json top5 missing-info]
   (let [result-map (:results (js->clj json :keywordize-keys true))
-	new-tweets (reduce (fn [m tweet]
-				       (if (get m (:from_user tweet))
-					 m
-					 (assoc m (:from_user tweet) tweet)))
-				     {} result-map)]
-    (redraw-leaderboard (into have-info new-tweets))))
+	update-graph (buzz/update-graph {} (vals (reduce (fn [m tweet]
+                                                           (if (get m (:from_user tweet))
+                                                             m
+                                                             (assoc m (:from_user tweet) tweet)))
+                                                         {} result-map)))]
+    (redraw-leaderboard (map (fn [[username user-info]]
+                               (if-let [node (get update-graph username)]
+                                 [username (merge user-info node)]
+                                 [username user-info]))
+                             top5))))
 
 (defn update-leaderboard [graph]
   (let [top5 (take 5 (leaders (seq graph)))
@@ -61,7 +65,7 @@
     (if (empty? missing-info)
       (redraw-leaderboard top5)
       (retrieve-missing-info missing-info (fn [json]
-					    (receive-user-info json have-info missing-info))))))
+                                            (receive-user-info json top5 missing-info))))))
 
 (buzz/register :track-clicked #(buzz/remove-children "leaderboard-content"))
 (buzz/register :graph-update update-leaderboard)
