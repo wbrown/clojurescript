@@ -5,4 +5,4 @@ goog.addDependency("../cljs/analyzer.js", ['cljs.analyzer'], ['cljs.core', 'cloj
 goog.addDependency("../cljs/reader.js", ['cljs.reader'], ['cljs.core', 'goog.string']);
 goog.addDependency("../cljs/compiler.js", ['cljs.compiler'], ['cljs.analyzer', 'cljs.core', 'clojure.string']);
 goog.addDependency("../bs.js", ['bs'], ['cljs.core']);
-goog.addDependency("../mrv7f.js", ['jsrepl'], ['cljs.core', 'cljs.reader', 'cljs.compiler', 'cljs.analyzer', 'bs', 'cljs.core']);
+goog.addDependency("../gTxYR.js", ['webrepl'], ['cljs.core', 'cljs.reader', 'cljs.compiler', 'cljs.analyzer', 'bs', 'cljs.core']);

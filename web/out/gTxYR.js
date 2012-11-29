@@ -1,11 +1,11 @@
-goog.provide('jsrepl');
+goog.provide('webrepl');
 goog.require('cljs.core');
 goog.require('cljs.reader');
 goog.require('cljs.compiler');
 goog.require('cljs.analyzer');
 goog.require('bs');
 goog.require('cljs.core');
-jsrepl.dom = (function dom(o){
+webrepl.dom = (function dom(o){
 if(cljs.core.coll_QMARK_.call(null,o))
 {var vec__2840 = o;
 var tag = cljs.core.nth.call(null,vec__2840,0,null);
@@ -35,7 +35,7 @@ break;
 }
 } else
 {}
-return cljs.core.PersistentVector.fromArray([jsrepl.append_dom.call(null,elem,((cljs.core.map_QMARK_.call(null,attrs))?body:cljs.core.cons.call(null,attrs,body)))], true);
+return cljs.core.PersistentVector.fromArray([webrepl.append_dom.call(null,elem,((cljs.core.map_QMARK_.call(null,attrs))?body:cljs.core.cons.call(null,attrs,body)))], true);
 } else
 {return cljs.core.mapcat.call(null,dom,o);
 }
@@ -47,8 +47,8 @@ return cljs.core.PersistentVector.fromArray([jsrepl.append_dom.call(null,elem,((
 }
 }
 });
-jsrepl.append_dom = (function append_dom(parent,v){
-var G__2849_2850 = cljs.core.seq.call(null,jsrepl.dom.call(null,v));
+webrepl.append_dom = (function append_dom(parent,v){
+var G__2849_2850 = cljs.core.seq.call(null,webrepl.dom.call(null,v));
 while(true){
 if(G__2849_2850)
 {var i_2851 = cljs.core.first.call(null,G__2849_2850);
@@ -64,14 +64,14 @@ break;
 }
 return parent;
 });
-jsrepl._STAR_print_class_STAR_ = null;
-jsrepl._STAR_e = null;
-jsrepl.repl_print = (function repl_print(log,text,cls){
+webrepl._STAR_print_class_STAR_ = null;
+webrepl._STAR_e = null;
+webrepl.repl_print = (function repl_print(log,text,cls){
 var G__2854_2855 = cljs.core.seq.call(null,[cljs.core.str(text)].join('').split(/\n/));
 while(true){
 if(G__2854_2855)
 {var line_2856 = cljs.core.first.call(null,G__2854_2855);
-jsrepl.append_dom.call(null,log,cljs.core.PersistentVector.fromArray(["\uFDD0'div",cljs.core.ObjMap.fromObject(["\uFDD0'class"],{"\uFDD0'class":[cljs.core.str("cg "),cljs.core.str((cljs.core.truth_(cls)?[cljs.core.str(" "),cljs.core.str(cls)].join(''):null))].join('')}),line_2856], true));
+webrepl.append_dom.call(null,log,cljs.core.PersistentVector.fromArray(["\uFDD0'div",cljs.core.ObjMap.fromObject(["\uFDD0'class"],{"\uFDD0'class":[cljs.core.str("cg "),cljs.core.str((cljs.core.truth_(cls)?[cljs.core.str(" "),cljs.core.str(cls)].join(''):null))].join('')}),line_2856], true));
 {
 var G__2857 = cljs.core.next.call(null,G__2854_2855);
 G__2854_2855 = G__2857;
@@ -83,15 +83,15 @@ break;
 }
 return log.scrollTop = log.scrollHeight;
 });
-jsrepl.postexpr = (function postexpr(log,text){
-return jsrepl.append_dom.call(null,log,cljs.core.PersistentVector.fromArray(["\uFDD0'table",cljs.core.PersistentVector.fromArray(["\uFDD0'tbody",cljs.core.PersistentVector.fromArray(["\uFDD0'tr",cljs.core.PersistentVector.fromArray(["\uFDD0'td",cljs.core.ObjMap.fromObject(["\uFDD0'class"],{"\uFDD0'class":"cg"}),"user=> "], true),cljs.core.PersistentVector.fromArray(["\uFDD0'td",text.replace(/\n$/,"")], true)], true)], true)], true));
+webrepl.postexpr = (function postexpr(log,text){
+return webrepl.append_dom.call(null,log,cljs.core.PersistentVector.fromArray(["\uFDD0'table",cljs.core.PersistentVector.fromArray(["\uFDD0'tbody",cljs.core.PersistentVector.fromArray(["\uFDD0'tr",cljs.core.PersistentVector.fromArray(["\uFDD0'td",cljs.core.ObjMap.fromObject(["\uFDD0'class"],{"\uFDD0'class":"cg"}),"user=> "], true),cljs.core.PersistentVector.fromArray(["\uFDD0'td",text.replace(/\n$/,"")], true)], true)], true)], true));
 });
-jsrepl.pep = (function pep(log,text){
-jsrepl.postexpr.call(null,log,text);
-try{return jsrepl.repl_print.call(null,log,cljs.core.pr_str.call(null,eval(cljs.compiler.emit_str.call(null,cljs.analyzer.analyze.call(null,env,cljs.reader.read_string.call(null,text))))),"rtn");
+webrepl.pep = (function pep(log,text){
+webrepl.postexpr.call(null,log,text);
+try{return webrepl.repl_print.call(null,log,cljs.core.pr_str.call(null,eval(cljs.compiler.emit_str.call(null,cljs.analyzer.analyze.call(null,env,cljs.reader.read_string.call(null,text))))),"rtn");
 }catch (e2861){if(cljs.core.instance_QMARK_.call(null,Error,e2861))
 {var e = e2861;
-return jsrepl.repl_print.call(null,log,e,"err");
+return webrepl.repl_print.call(null,log,e,"err");
 } else
 {if("\uFDD0'else")
 {throw e2861;
@@ -105,18 +105,18 @@ var log = document.getElementById("log");
 var input = document.getElementById("input");
 var status = document.getElementById("status");
 cljs.core._STAR_print_fn_STAR_ = (function (p1__2859_SHARP_){
-return jsrepl.repl_print.call(null,log,p1__2859_SHARP_,null);
+return webrepl.repl_print.call(null,log,p1__2859_SHARP_,null);
 });
 input.onkeypress = (function (ev){
 if(((function (){var or__3824__auto__ = ev;
 if(cljs.core.truth_(or__3824__auto__))
 {return or__3824__auto__;
 } else
-{return jsrepl.event;
+{return webrepl.event;
 }
 })().keyCode === 13))
 {try{var form = cljs.reader.read_string.call(null,input.value);
-jsrepl.pep.call(null,log,input.value);
+webrepl.pep.call(null,log,input.value);
 setTimeout((function (){
 return input.value = "";
 }),0);
@@ -126,7 +126,7 @@ return status.src = "blank.gif";
 if(cljs.core._EQ_.call(null,e.message,"EOF while reading"))
 {return status.src = "dots.png";
 } else
-{return jsrepl.repl_print.call(null,log,e,"err");
+{return webrepl.repl_print.call(null,log,e,"err");
 }
 } else
 {if("\uFDD0'else")
@@ -140,11 +140,11 @@ if(cljs.core._EQ_.call(null,e.message,"EOF while reading"))
 }
 });
 cljs.core.println.call(null,";; ClojureScript");
-jsrepl.append_dom.call(null,log,cljs.core.PersistentVector.fromArray(["\uFDD0'div",cljs.core.ObjMap.fromObject(["\uFDD0'class"],{"\uFDD0'class":"cg"}),";;   - ",cljs.core.PersistentVector.fromArray(["\uFDD0'a",cljs.core.ObjMap.fromObject(["\uFDD0'href"],{"\uFDD0'href":"http://github.com/kanaka/clojurescript"}),"http://github.com/kanaka/clojurescript"], true)], true));
+webrepl.append_dom.call(null,log,cljs.core.PersistentVector.fromArray(["\uFDD0'div",cljs.core.ObjMap.fromObject(["\uFDD0'class"],{"\uFDD0'class":"cg"}),";;   - ",cljs.core.PersistentVector.fromArray(["\uFDD0'a",cljs.core.ObjMap.fromObject(["\uFDD0'href"],{"\uFDD0'href":"http://github.com/kanaka/clojurescript"}),"http://github.com/kanaka/clojurescript"], true)], true));
 cljs.core.println.call(null,";;   - A port of the ClojureScript to ClojureScript");
 cljs.core.println.call(null,";;   - No macros (yet)");
-jsrepl.pep.call(null,log,"(+ 1 2)");
-jsrepl.pep.call(null,log,"(def double (fn* [x] (* x x)))");
-jsrepl.pep.call(null,log,"(double 8)");
+webrepl.pep.call(null,log,"(+ 1 2)");
+webrepl.pep.call(null,log,"(def sqr (fn* [x] (* x x)))");
+webrepl.pep.call(null,log,"(sqr 8)");
 return input.focus();
 });
