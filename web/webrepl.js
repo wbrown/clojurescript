@@ -4,4 +4,4 @@ goog.addDependency("../clojure/string.js", ['clojure.string'], ['cljs.core', 'go
 goog.addDependency("../cljs/analyzer.js", ['cljs.analyzer'], ['cljs.core', 'clojure.string']);
 goog.addDependency("../cljs/reader.js", ['cljs.reader'], ['cljs.analyzer', 'cljs.core', 'goog.string']);
 goog.addDependency("../cljs/compiler.js", ['cljs.compiler'], ['cljs.analyzer', 'cljs.core', 'clojure.string']);
-goog.addDependency("../G4bK1.js", ['webrepl'], ['cljs.core', 'cljs.reader', 'cljs.compiler', 'cljs.analyzer', 'cljs.core']);
+goog.addDependency("../XQaTO.js", ['webrepl'], ['cljs.core', 'cljs.reader', 'cljs.compiler', 'cljs.analyzer', 'cljs.core']);

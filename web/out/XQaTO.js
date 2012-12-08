@@ -148,5 +148,7 @@ cljs.core.println.call(null,";;   - No macros (yet)");
 webrepl.pep.call(null,log,"(+ 1 2)");
 webrepl.pep.call(null,log,"(def sqr (fn* [x] (* x x)))");
 webrepl.pep.call(null,log,"(sqr 8)");
+webrepl.pep.call(null,log,"(defmacro unless [pred a b] `(if (not ~pred) ~a ~b))");
+webrepl.pep.call(null,log,"(unless false :yep :nope)");
 return input.focus();
 });
