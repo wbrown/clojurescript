@@ -1,96 +1,7 @@
 goog.provide('cljs.reader');
 goog.require('cljs.core');
+goog.require('cljs.analyzer');
 goog.require('goog.string');
-cljs.reader.PushbackReader = {};
-cljs.reader.read_char = (function read_char(reader){
-if((function (){var and__3822__auto__ = reader;
-if(and__3822__auto__)
-{return reader.cljs$reader$PushbackReader$read_char$arity$1;
-} else
-{return and__3822__auto__;
-}
-})())
-{return reader.cljs$reader$PushbackReader$read_char$arity$1(reader);
-} else
-{var x__2003__auto__ = (((reader == null))?null:reader);
-return (function (){var or__3824__auto__ = (cljs.reader.read_char[goog.typeOf(x__2003__auto__)]);
-if(or__3824__auto__)
-{return or__3824__auto__;
-} else
-{var or__3824__auto____$1 = (cljs.reader.read_char["_"]);
-if(or__3824__auto____$1)
-{return or__3824__auto____$1;
-} else
-{throw cljs.core.missing_protocol.call(null,"PushbackReader.read-char",reader);
-}
-}
-})().call(null,reader);
-}
-});
-cljs.reader.unread = (function unread(reader,ch){
-if((function (){var and__3822__auto__ = reader;
-if(and__3822__auto__)
-{return reader.cljs$reader$PushbackReader$unread$arity$2;
-} else
-{return and__3822__auto__;
-}
-})())
-{return reader.cljs$reader$PushbackReader$unread$arity$2(reader,ch);
-} else
-{var x__2003__auto__ = (((reader == null))?null:reader);
-return (function (){var or__3824__auto__ = (cljs.reader.unread[goog.typeOf(x__2003__auto__)]);
-if(or__3824__auto__)
-{return or__3824__auto__;
-} else
-{var or__3824__auto____$1 = (cljs.reader.unread["_"]);
-if(or__3824__auto____$1)
-{return or__3824__auto____$1;
-} else
-{throw cljs.core.missing_protocol.call(null,"PushbackReader.unread",reader);
-}
-}
-})().call(null,reader,ch);
-}
-});
-goog.provide('cljs.reader.StringPushbackReader');
-
-/**
-* @constructor
-*/
-cljs.reader.StringPushbackReader = (function (s,index_atom,buffer_atom){
-this.s = s;
-this.index_atom = index_atom;
-this.buffer_atom = buffer_atom;
-})
-cljs.reader.StringPushbackReader.cljs$lang$type = true;
-cljs.reader.StringPushbackReader.cljs$lang$ctorPrSeq = (function (this__1943__auto__){
-return cljs.core.list.call(null,"cljs.reader/StringPushbackReader");
-});
-cljs.reader.StringPushbackReader.cljs$lang$ctorPrWriter = (function (this__1943__auto__,writer__1944__auto__,opt__1945__auto__){
-return cljs.core._write.call(null,writer__1944__auto__,"cljs.reader/StringPushbackReader");
-});
-cljs.reader.StringPushbackReader.prototype.cljs$reader$PushbackReader$ = true;
-cljs.reader.StringPushbackReader.prototype.cljs$reader$PushbackReader$read_char$arity$1 = (function (reader){
-var self__ = this;
-if(cljs.core.empty_QMARK_.call(null,cljs.core.deref.call(null,self__.buffer_atom)))
-{var idx = cljs.core.deref.call(null,self__.index_atom);
-cljs.core.swap_BANG_.call(null,self__.index_atom,cljs.core.inc);
-return (self__.s[idx]);
-} else
-{var buf = cljs.core.deref.call(null,self__.buffer_atom);
-cljs.core.swap_BANG_.call(null,self__.buffer_atom,cljs.core.rest);
-return cljs.core.first.call(null,buf);
-}
-});
-cljs.reader.StringPushbackReader.prototype.cljs$reader$PushbackReader$unread$arity$2 = (function (reader,ch){
-var self__ = this;
-return cljs.core.swap_BANG_.call(null,self__.buffer_atom,(function (p1__3553_SHARP_){
-return cljs.core.cons.call(null,ch,p1__3553_SHARP_);
-}));
-});
-cljs.reader.push_back_reader = (function push_back_reader(s){
-return (new cljs.reader.StringPushbackReader(s,cljs.core.atom.call(null,0),cljs.core.atom.call(null,null)));
-});
 /**
 * Checks whether a given character is whitespace
 */
@@ -130,8 +41,8 @@ if(or__3824__auto____$1)
 }
 })();
 if(cljs.core.truth_(and__3822__auto__))
-{return cljs.reader.numeric_QMARK_.call(null,(function (){var next_ch = cljs.reader.read_char.call(null,reader);
-cljs.reader.unread.call(null,reader,next_ch);
+{return cljs.reader.numeric_QMARK_.call(null,(function (){var next_ch = cljs.core.read_char.call(null,reader);
+cljs.core.unread.call(null,reader,next_ch);
 return next_ch;
 })());
 } else
@@ -154,9 +65,9 @@ if (goog.isDef(var_args)) {
 return reader_error__delegate.call(this, rdr, msg);
 };
 reader_error.cljs$lang$maxFixedArity = 1;
-reader_error.cljs$lang$applyTo = (function (arglist__3554){
-var rdr = cljs.core.first(arglist__3554);
-var msg = cljs.core.rest(arglist__3554);
+reader_error.cljs$lang$applyTo = (function (arglist__3577){
+var rdr = cljs.core.first(arglist__3577);
+var msg = cljs.core.rest(arglist__3577);
 return reader_error__delegate(rdr, msg);
 });
 reader_error.cljs$lang$arity$variadic = reader_error__delegate;
@@ -183,7 +94,7 @@ if(and__3822__auto____$2)
 });
 cljs.reader.read_token = (function read_token(rdr,initch){
 var sb = (new goog.string.StringBuffer(initch));
-var ch = cljs.reader.read_char.call(null,rdr);
+var ch = cljs.core.read_char.call(null,rdr);
 while(true){
 if((function (){var or__3824__auto__ = (ch == null);
 if(or__3824__auto__)
@@ -197,16 +108,16 @@ if(or__3824__auto____$1)
 }
 }
 })())
-{cljs.reader.unread.call(null,rdr,ch);
+{cljs.core.unread.call(null,rdr,ch);
 return sb.toString();
 } else
 {{
-var G__3555 = (function (){sb.append(ch);
+var G__3578 = (function (){sb.append(ch);
 return sb;
 })();
-var G__3556 = cljs.reader.read_char.call(null,rdr);
-sb = G__3555;
-ch = G__3556;
+var G__3579 = cljs.core.read_char.call(null,rdr);
+sb = G__3578;
+ch = G__3579;
 continue;
 }
 }
@@ -218,7 +129,7 @@ break;
 */
 cljs.reader.skip_line = (function skip_line(reader,_){
 while(true){
-var ch = cljs.reader.read_char.call(null,reader);
+var ch = cljs.core.read_char.call(null,reader);
 if((function (){var or__3824__auto__ = (ch === "n");
 if(or__3824__auto__)
 {return or__3824__auto__;
@@ -357,10 +268,10 @@ if((c === "t"))
 }
 });
 cljs.reader.read_2_chars = (function read_2_chars(reader){
-return (new goog.string.StringBuffer(cljs.reader.read_char.call(null,reader),cljs.reader.read_char.call(null,reader))).toString();
+return (new goog.string.StringBuffer(cljs.core.read_char.call(null,reader),cljs.core.read_char.call(null,reader))).toString();
 });
 cljs.reader.read_4_chars = (function read_4_chars(reader){
-return (new goog.string.StringBuffer(cljs.reader.read_char.call(null,reader),cljs.reader.read_char.call(null,reader),cljs.reader.read_char.call(null,reader),cljs.reader.read_char.call(null,reader))).toString();
+return (new goog.string.StringBuffer(cljs.core.read_char.call(null,reader),cljs.core.read_char.call(null,reader),cljs.core.read_char.call(null,reader),cljs.core.read_char.call(null,reader))).toString();
 });
 cljs.reader.unicode_2_pattern = cljs.core.re_pattern.call(null,"[0-9A-Fa-f]{2}");
 cljs.reader.unicode_4_pattern = cljs.core.re_pattern.call(null,"[0-9A-Fa-f]{4}");
@@ -376,7 +287,7 @@ var code = parseInt(code_str,16);
 return String.fromCharCode(code);
 });
 cljs.reader.escape_char = (function escape_char(buffer,reader){
-var ch = cljs.reader.read_char.call(null,reader);
+var ch = cljs.core.read_char.call(null,reader);
 var mapresult = cljs.reader.escape_char_map.call(null,ch);
 if(cljs.core.truth_(mapresult))
 {return mapresult;
@@ -405,12 +316,12 @@ if(cljs.core.truth_(mapresult))
 * char.
 */
 cljs.reader.read_past = (function read_past(pred,rdr){
-var ch = cljs.reader.read_char.call(null,rdr);
+var ch = cljs.core.read_char.call(null,rdr);
 while(true){
 if(cljs.core.truth_(pred.call(null,ch)))
 {{
-var G__3557 = cljs.reader.read_char.call(null,rdr);
-ch = G__3557;
+var G__3580 = cljs.core.read_char.call(null,rdr);
+ch = G__3580;
 continue;
 }
 } else
@@ -435,16 +346,16 @@ if(cljs.core.truth_(temp__3971__auto__))
 {var macrofn = temp__3971__auto__;
 var mret = macrofn.call(null,rdr,ch);
 {
-var G__3558 = (((mret === rdr))?a:cljs.core.conj_BANG_.call(null,a,mret));
-a = G__3558;
+var G__3581 = (((mret === rdr))?a:cljs.core.conj_BANG_.call(null,a,mret));
+a = G__3581;
 continue;
 }
 } else
-{cljs.reader.unread.call(null,rdr,ch);
+{cljs.core.unread.call(null,rdr,ch);
 var o = cljs.reader.read.call(null,rdr,true,null,recursive_QMARK_);
 {
-var G__3559 = (((o === rdr))?a:cljs.core.conj_BANG_.call(null,a,o));
-a = G__3559;
+var G__3582 = (((o === rdr))?a:cljs.core.conj_BANG_.call(null,a,o));
+a = G__3582;
 continue;
 }
 }
@@ -456,7 +367,7 @@ cljs.reader.not_implemented = (function not_implemented(rdr,ch){
 return cljs.reader.reader_error.call(null,rdr,"Reader for ",ch," not implemented yet");
 });
 cljs.reader.read_dispatch = (function read_dispatch(rdr,_){
-var ch = cljs.reader.read_char.call(null,rdr);
+var ch = cljs.core.read_char.call(null,rdr);
 var dm = cljs.reader.dispatch_macros.call(null,ch);
 if(cljs.core.truth_(dm))
 {return dm.call(null,rdr,_);
@@ -490,7 +401,7 @@ return cljs.core.apply.call(null,cljs.core.hash_map,l);
 });
 cljs.reader.read_number = (function read_number(reader,initch){
 var buffer = (new goog.string.StringBuffer(initch));
-var ch = cljs.reader.read_char.call(null,reader);
+var ch = cljs.core.read_char.call(null,reader);
 while(true){
 if(cljs.core.truth_((function (){var or__3824__auto__ = (ch == null);
 if(or__3824__auto__)
@@ -504,7 +415,7 @@ if(or__3824__auto____$1)
 }
 }
 })()))
-{cljs.reader.unread.call(null,reader,ch);
+{cljs.core.unread.call(null,reader,ch);
 var s = buffer.toString();
 var or__3824__auto__ = cljs.reader.match_number.call(null,s);
 if(cljs.core.truth_(or__3824__auto__))
@@ -514,12 +425,12 @@ if(cljs.core.truth_(or__3824__auto__))
 }
 } else
 {{
-var G__3560 = (function (){buffer.append(ch);
+var G__3583 = (function (){buffer.append(ch);
 return buffer;
 })();
-var G__3561 = cljs.reader.read_char.call(null,reader);
-buffer = G__3560;
-ch = G__3561;
+var G__3584 = cljs.core.read_char.call(null,reader);
+buffer = G__3583;
+ch = G__3584;
 continue;
 }
 }
@@ -528,19 +439,19 @@ break;
 });
 cljs.reader.read_string_STAR_ = (function read_string_STAR_(reader,_){
 var buffer = (new goog.string.StringBuffer());
-var ch = cljs.reader.read_char.call(null,reader);
+var ch = cljs.core.read_char.call(null,reader);
 while(true){
 if((ch == null))
 {return cljs.reader.reader_error.call(null,reader,"EOF while reading");
 } else
 {if(("\\" === ch))
 {{
-var G__3562 = (function (){buffer.append(cljs.reader.escape_char.call(null,buffer,reader));
+var G__3585 = (function (){buffer.append(cljs.reader.escape_char.call(null,buffer,reader));
 return buffer;
 })();
-var G__3563 = cljs.reader.read_char.call(null,reader);
-buffer = G__3562;
-ch = G__3563;
+var G__3586 = cljs.core.read_char.call(null,reader);
+buffer = G__3585;
+ch = G__3586;
 continue;
 }
 } else
@@ -549,12 +460,12 @@ continue;
 } else
 {if("\uFDD0'default")
 {{
-var G__3564 = (function (){buffer.append(ch);
+var G__3587 = (function (){buffer.append(ch);
 return buffer;
 })();
-var G__3565 = cljs.reader.read_char.call(null,reader);
-buffer = G__3564;
-ch = G__3565;
+var G__3588 = cljs.core.read_char.call(null,reader);
+buffer = G__3587;
+ch = G__3588;
 continue;
 }
 } else
@@ -594,7 +505,7 @@ if(cljs.core.truth_(goog.string.contains(token,"/")))
 }
 });
 cljs.reader.read_keyword = (function read_keyword(reader,initch){
-var token = cljs.reader.read_token.call(null,reader,cljs.reader.read_char.call(null,reader));
+var token = cljs.reader.read_token.call(null,reader,cljs.core.read_char.call(null,reader));
 var a = cljs.reader.re_matches_STAR_.call(null,cljs.reader.symbol_pattern,token);
 var token__$1 = (a[0]);
 var ns = (a[1]);
@@ -668,30 +579,404 @@ if(cljs.core.map_QMARK_.call(null,m))
 {cljs.reader.reader_error.call(null,rdr,"Metadata must be Symbol,Keyword,String or Map");
 }
 var o = cljs.reader.read.call(null,rdr,true,null,true);
-if((function (){var G__3567 = o;
-if(G__3567)
-{if((function (){var or__3824__auto__ = (G__3567.cljs$lang$protocol_mask$partition0$ & 262144);
+if((function (){var G__3590 = o;
+if(G__3590)
+{if((function (){var or__3824__auto__ = (G__3590.cljs$lang$protocol_mask$partition0$ & 262144);
 if(or__3824__auto__)
 {return or__3824__auto__;
 } else
-{return G__3567.cljs$core$IWithMeta$;
+{return G__3590.cljs$core$IWithMeta$;
 }
 })())
 {return true;
 } else
-{if((!G__3567.cljs$lang$protocol_mask$partition0$))
-{return cljs.core.type_satisfies_.call(null,cljs.core.IWithMeta,G__3567);
+{if((!G__3590.cljs$lang$protocol_mask$partition0$))
+{return cljs.core.type_satisfies_.call(null,cljs.core.IWithMeta,G__3590);
 } else
 {return false;
 }
 }
 } else
-{return cljs.core.type_satisfies_.call(null,cljs.core.IWithMeta,G__3567);
+{return cljs.core.type_satisfies_.call(null,cljs.core.IWithMeta,G__3590);
 }
 })())
 {return cljs.core.with_meta.call(null,o,cljs.core.merge.call(null,cljs.core.meta.call(null,o),m));
 } else
 {return cljs.reader.reader_error.call(null,rdr,"Metadata can only be applied to IWithMetas");
+}
+});
+cljs.reader.UNQUOTE = "\uFDD0'__thisInternalKeywordRepresentsUnquoteToTheReader__";
+cljs.reader.UNQUOTE_SPICING = "\uFDD0'__thisInternalKeywordRepresentsUnquoteSplicingToTheReader__";
+cljs.reader._STAR_gensym_env_STAR_ = cljs.core.atom.call(null,null);
+cljs.reader.isUnquote_QMARK_ = (function isUnquote_QMARK_(form){
+var and__3822__auto__ = (function (){var G__3592 = form;
+if(G__3592)
+{if((function (){var or__3824__auto__ = (G__3592.cljs$lang$protocol_mask$partition0$ & 64);
+if(or__3824__auto__)
+{return or__3824__auto__;
+} else
+{return G__3592.cljs$core$ISeq$;
+}
+})())
+{return true;
+} else
+{if((!G__3592.cljs$lang$protocol_mask$partition0$))
+{return cljs.core.type_satisfies_.call(null,cljs.core.ISeq,G__3592);
+} else
+{return false;
+}
+}
+} else
+{return cljs.core.type_satisfies_.call(null,cljs.core.ISeq,G__3592);
+}
+})();
+if(cljs.core.truth_(and__3822__auto__))
+{return cljs.core._EQ_.call(null,cljs.core.first.call(null,form),cljs.reader.UNQUOTE);
+} else
+{return and__3822__auto__;
+}
+});
+cljs.reader.isUnquoteSplicing_QMARK_ = (function isUnquoteSplicing_QMARK_(form){
+var and__3822__auto__ = (function (){var G__3594 = form;
+if(G__3594)
+{if((function (){var or__3824__auto__ = (G__3594.cljs$lang$protocol_mask$partition0$ & 64);
+if(or__3824__auto__)
+{return or__3824__auto__;
+} else
+{return G__3594.cljs$core$ISeq$;
+}
+})())
+{return true;
+} else
+{if((!G__3594.cljs$lang$protocol_mask$partition0$))
+{return cljs.core.type_satisfies_.call(null,cljs.core.ISeq,G__3594);
+} else
+{return false;
+}
+}
+} else
+{return cljs.core.type_satisfies_.call(null,cljs.core.ISeq,G__3594);
+}
+})();
+if(cljs.core.truth_(and__3822__auto__))
+{return cljs.core._EQ_.call(null,cljs.core.first.call(null,form),cljs.reader.UNQUOTE_SPLICING);
+} else
+{return and__3822__auto__;
+}
+});
+cljs.reader.sqExpandList = (function sqExpandList(sq){
+return cljs.core.doall.call(null,(function (){var iter__2101__auto__ = (function iter__3597(s__3598){
+return (new cljs.core.LazySeq(null,false,(function (){
+var s__3598__$1 = s__3598;
+while(true){
+if(cljs.core.seq.call(null,s__3598__$1))
+{var item = cljs.core.first.call(null,s__3598__$1);
+return cljs.core.cons.call(null,(cljs.core.truth_(cljs.reader.isUnquote_QMARK_.call(null,item))?cljs.core.list.call(null,"\uFDD1'list",cljs.core.second.call(null,item)):(cljs.core.truth_(cljs.reader.isUnquoteSplicing_QMARK_.call(null,item))?cljs.core.second.call(null,item):(("\uFDD0'else")?cljs.core.list.call(null,"\uFDD1'list",cljs.reader.syntaxQuote.call(null,item)):null))),iter__3597.call(null,cljs.core.rest.call(null,s__3598__$1)));
+} else
+{return null;
+}
+break;
+}
+}),null));
+});
+return iter__2101__auto__.call(null,sq);
+})());
+});
+cljs.reader.syntaxQuote = (function syntaxQuote(form){
+if(cljs.core.truth_(cljs.core._lookup.call(null,cljs.analyzer.specials,form,null)))
+{return cljs.core.list.call(null,"\uFDD1'quote",form);
+} else
+{if(cljs.core.symbol_QMARK_.call(null,form))
+{var sym = form;
+var name = cljs.core.name.call(null,sym);
+var ns = cljs.core.namespace.call(null,sym);
+var var$ = cljs.analyzer.resolve_existing_var.call(null,cljs.analyzer.empty_env.call(null),sym);
+if((function (){var and__3822__auto__ = cljs.core.not.call(null,ns);
+if(and__3822__auto__)
+{return cljs.core._EQ_.call(null,"#",cljs.core.last.call(null,name));
+} else
+{return and__3822__auto__;
+}
+})())
+{var new_name = cljs.core.subs.call(null,name,0,(cljs.core.count.call(null,name) - 1));
+var gmap = cljs.core.deref.call(null,cljs.reader._STAR_gensym_env_STAR_);
+if(cljs.core.not.call(null,gmap))
+{cljs.reader.reader_error.call(null,null,"Gensym literal not in syntax-quote");
+} else
+{}
+var gs = (function (){var or__3824__auto__ = cljs.core._lookup.call(null,gmap,sym,null);
+if(cljs.core.truth_(or__3824__auto__))
+{return or__3824__auto__;
+} else
+{return cljs.core.gensym.call(null,[cljs.core.str(new_name),cljs.core.str("__auto__")].join(''));
+}
+})();
+cljs.core.swap_BANG_.call(null,cljs.reader._STAR_gensym_env_STAR_,cljs.core.assoc,sym,gs);
+return cljs.core.list.call(null,"\uFDD1'quote",gs);
+} else
+{if((function (){var and__3822__auto__ = cljs.core.not.call(null,ns);
+if(and__3822__auto__)
+{return cljs.core._EQ_.call(null,".",cljs.core.last.call(null,name));
+} else
+{return and__3822__auto__;
+}
+})())
+{var new_name = cljs.core.subs.call(null,name,0,(cljs.core.count.call(null,name) - 1));
+var new_var = cljs.analyzer.resolve_existing_var.call(null,cljs.analyzer.empty_env.call(null),cljs.core.symbol.call(null,new_name));
+return cljs.core.list.call(null,"\uFDD1'quote",(new cljs.core.Keyword("\uFDD0'name")).call(null,new_var));
+} else
+{if((function (){var and__3822__auto__ = cljs.core.not.call(null,ns);
+if(and__3822__auto__)
+{return cljs.core._EQ_.call(null,".",cljs.core.first.call(null,name));
+} else
+{return and__3822__auto__;
+}
+})())
+{return cljs.core.list.call(null,"\uFDD1'quote",sym);
+} else
+{if("\uFDD0'else")
+{return cljs.core.list.call(null,"\uFDD1'quote",(new cljs.core.Keyword("\uFDD0'name")).call(null,cljs.analyzer.resolve_existing_var.call(null,cljs.analyzer.empty_env.call(null),sym)));
+} else
+{return null;
+}
+}
+}
+}
+} else
+{if(cljs.core.truth_(cljs.reader.isUnquote_QMARK_.call(null,form)))
+{return cljs.core.second.call(null,form);
+} else
+{if(cljs.core.truth_(cljs.reader.isUnquoteSplicing_QMARK_.call(null,form)))
+{return cljs.reader.reader_error.call(null,cljs.reader.rdr,"Reader ~@ splice not in list");
+} else
+{if((function (){var G__3606 = form;
+if(G__3606)
+{if((function (){var or__3824__auto__ = (G__3606.cljs$lang$protocol_mask$partition0$ & 8);
+if(or__3824__auto__)
+{return or__3824__auto__;
+} else
+{return G__3606.cljs$core$ICollection$;
+}
+})())
+{return true;
+} else
+{if((!G__3606.cljs$lang$protocol_mask$partition0$))
+{return cljs.core.type_satisfies_.call(null,cljs.core.ICollection,G__3606);
+} else
+{return false;
+}
+}
+} else
+{return cljs.core.type_satisfies_.call(null,cljs.core.ICollection,G__3606);
+}
+})())
+{if((function (){var G__3607 = form;
+if(G__3607)
+{if((function (){var or__3824__auto__ = (G__3607.cljs$lang$protocol_mask$partition0$ & 67108864);
+if(or__3824__auto__)
+{return or__3824__auto__;
+} else
+{return G__3607.cljs$core$IRecord$;
+}
+})())
+{return true;
+} else
+{if((!G__3607.cljs$lang$protocol_mask$partition0$))
+{return cljs.core.type_satisfies_.call(null,cljs.core.IRecord,G__3607);
+} else
+{return false;
+}
+}
+} else
+{return cljs.core.type_satisfies_.call(null,cljs.core.IRecord,G__3607);
+}
+})())
+{return form;
+} else
+{if((function (){var G__3608 = form;
+if(G__3608)
+{if((function (){var or__3824__auto__ = (G__3608.cljs$lang$protocol_mask$partition0$ & 1024);
+if(or__3824__auto__)
+{return or__3824__auto__;
+} else
+{return G__3608.cljs$core$IMap$;
+}
+})())
+{return true;
+} else
+{if((!G__3608.cljs$lang$protocol_mask$partition0$))
+{return cljs.core.type_satisfies_.call(null,cljs.core.IMap,G__3608);
+} else
+{return false;
+}
+}
+} else
+{return cljs.core.type_satisfies_.call(null,cljs.core.IMap,G__3608);
+}
+})())
+{return cljs.core.list.call(null,"\uFDD1'apply","\uFDD1'hash-map",cljs.core.list.call(null,"\uFDD1'seq",cljs.core.cons.call(null,"\uFDD1'concat",cljs.reader.sqExpandList.call(null,cljs.core.apply.call(null,cljs.core.concat,cljs.core.seq.call(null,form))))));
+} else
+{if((function (){var G__3609 = form;
+if(G__3609)
+{if((function (){var or__3824__auto__ = (G__3609.cljs$lang$protocol_mask$partition0$ & 16384);
+if(or__3824__auto__)
+{return or__3824__auto__;
+} else
+{return G__3609.cljs$core$IVector$;
+}
+})())
+{return true;
+} else
+{if((!G__3609.cljs$lang$protocol_mask$partition0$))
+{return cljs.core.type_satisfies_.call(null,cljs.core.IVector,G__3609);
+} else
+{return false;
+}
+}
+} else
+{return cljs.core.type_satisfies_.call(null,cljs.core.IVector,G__3609);
+}
+})())
+{return cljs.core.list.call(null,"\uFDD1'apply","\uFDD1'vector",cljs.core.list.call(null,"\uFDD1'seq",cljs.core.cons.call(null,"\uFDD1'concat",cljs.reader.sqExpandList.call(null,form))));
+} else
+{if((function (){var G__3610 = form;
+if(G__3610)
+{if((function (){var or__3824__auto__ = (G__3610.cljs$lang$protocol_mask$partition0$ & 4096);
+if(or__3824__auto__)
+{return or__3824__auto__;
+} else
+{return G__3610.cljs$core$ISet$;
+}
+})())
+{return true;
+} else
+{if((!G__3610.cljs$lang$protocol_mask$partition0$))
+{return cljs.core.type_satisfies_.call(null,cljs.core.ISet,G__3610);
+} else
+{return false;
+}
+}
+} else
+{return cljs.core.type_satisfies_.call(null,cljs.core.ISet,G__3610);
+}
+})())
+{return cljs.core.list.call(null,"\uFDD1'apply","\uFDD1'hash-set",cljs.core.list.call(null,"\uFDD1'seq",cljs.core.cons.call(null,"\uFDD1'concat",cljs.reader.sqExpandList.call(null,cljs.core.seq.call(null,form)))));
+} else
+{if(cljs.core.truth_((function (){var or__3824__auto__ = (function (){var G__3611 = form;
+if(G__3611)
+{if((function (){var or__3824__auto__ = (G__3611.cljs$lang$protocol_mask$partition0$ & 64);
+if(or__3824__auto__)
+{return or__3824__auto__;
+} else
+{return G__3611.cljs$core$ISeq$;
+}
+})())
+{return true;
+} else
+{if((!G__3611.cljs$lang$protocol_mask$partition0$))
+{return cljs.core.type_satisfies_.call(null,cljs.core.ISeq,G__3611);
+} else
+{return false;
+}
+}
+} else
+{return cljs.core.type_satisfies_.call(null,cljs.core.ISeq,G__3611);
+}
+})();
+if(cljs.core.truth_(or__3824__auto__))
+{return or__3824__auto__;
+} else
+{var G__3612 = form;
+if(G__3612)
+{if((function (){var or__3824__auto____$1 = (G__3612.cljs$lang$protocol_mask$partition0$ & 33554432);
+if(or__3824__auto____$1)
+{return or__3824__auto____$1;
+} else
+{return G__3612.cljs$core$IList$;
+}
+})())
+{return true;
+} else
+{if((!G__3612.cljs$lang$protocol_mask$partition0$))
+{return cljs.core.type_satisfies_.call(null,cljs.core.IList,G__3612);
+} else
+{return false;
+}
+}
+} else
+{return cljs.core.type_satisfies_.call(null,cljs.core.IList,G__3612);
+}
+}
+})()))
+{var temp__3971__auto__ = cljs.core.seq.call(null,form);
+if(temp__3971__auto__)
+{var sq = temp__3971__auto__;
+return cljs.core.list.call(null,"\uFDD1'seq",cljs.core.cons.call(null,"\uFDD1'concat",cljs.reader.sqExpandList.call(null,sq)));
+} else
+{return cljs.core.cons.call(null,"\uFDD1'list",null);
+}
+} else
+{if("\uFDD0'else")
+{return cljs.reader.reader_error.call(null,cljs.reader.rdr,"Unknown Collection type");
+} else
+{return null;
+}
+}
+}
+}
+}
+}
+} else
+{if((function (){var or__3824__auto__ = cljs.core.keyword_QMARK_.call(null,form);
+if(or__3824__auto__)
+{return or__3824__auto__;
+} else
+{var or__3824__auto____$1 = cljs.core.number_QMARK_.call(null,form);
+if(or__3824__auto____$1)
+{return or__3824__auto____$1;
+} else
+{return cljs.core.string_QMARK_.call(null,form);
+}
+}
+})())
+{return form;
+} else
+{if("\uFDD0'else")
+{return cljs.core.list.call(null,"\uFDD1'quote",form);
+} else
+{return null;
+}
+}
+}
+}
+}
+}
+}
+});
+cljs.reader.read_syntax_quote = (function read_syntax_quote(rdr,_){
+var _STAR_gensym_env_STAR_3615 = cljs.reader._STAR_gensym_env_STAR_;
+try{cljs.reader._STAR_gensym_env_STAR_ = cljs.core.atom.call(null,cljs.core.ObjMap.EMPTY);
+var form = cljs.reader.read.call(null,rdr,true,null,true);
+return cljs.reader.syntaxQuote.call(null,form);
+}finally {cljs.reader._STAR_gensym_env_STAR_ = _STAR_gensym_env_STAR_3615;
+}});
+cljs.reader.read_unquote = (function read_unquote(rdr,_){
+var ch = cljs.core.read_char.call(null,rdr);
+if(cljs.core._EQ_.call(null,null,ch))
+{return cljs.reader.reader_error.call(null,rdr,"EOF while reading character");
+} else
+{if(cljs.core._EQ_.call(null,"@",ch))
+{var o = cljs.reader.read.call(null,rdr,true,null,true);
+return cljs.core.list.call(null,cljs.reader.UNQUOTE_SPLICING,o);
+} else
+{if("\uFDD0'else")
+{cljs.core.unread.call(null,rdr,ch);
+var o = cljs.reader.read.call(null,rdr,true,null,true);
+return cljs.core.list.call(null,cljs.reader.UNQUOTE,o);
+} else
+{return null;
+}
+}
 }
 });
 cljs.reader.read_set = (function read_set(rdr,_){
@@ -724,10 +1009,10 @@ if((c === "\""))
 {return cljs.reader.read_meta;
 } else
 {if((c === "`"))
-{return cljs.reader.not_implemented;
+{return cljs.reader.read_syntax_quote;
 } else
 {if((c === "~"))
-{return cljs.reader.not_implemented;
+{return cljs.reader.read_unquote;
 } else
 {if((c === "("))
 {return cljs.reader.read_list;
@@ -748,7 +1033,7 @@ if((c === "\""))
 {return cljs.reader.read_unmatched_delimiter;
 } else
 {if((c === "\\"))
-{return cljs.reader.read_char;
+{return cljs.core.read_char;
 } else
 {if((c === "%"))
 {return cljs.reader.not_implemented;
@@ -812,7 +1097,7 @@ if((s === "{"))
 */
 cljs.reader.read = (function read(reader,eof_is_error,sentinel,is_recursive){
 while(true){
-var ch = cljs.reader.read_char.call(null,reader);
+var ch = cljs.core.read_char.call(null,reader);
 if((ch == null))
 {if(cljs.core.truth_(eof_is_error))
 {return cljs.reader.reader_error.call(null,reader,"EOF while reading");
@@ -822,27 +1107,27 @@ if((ch == null))
 } else
 {if(cljs.reader.whitespace_QMARK_.call(null,ch))
 {{
-var G__3568 = reader;
-var G__3569 = eof_is_error;
-var G__3570 = sentinel;
-var G__3571 = is_recursive;
-reader = G__3568;
-eof_is_error = G__3569;
-sentinel = G__3570;
-is_recursive = G__3571;
+var G__3617 = reader;
+var G__3618 = eof_is_error;
+var G__3619 = sentinel;
+var G__3620 = is_recursive;
+reader = G__3617;
+eof_is_error = G__3618;
+sentinel = G__3619;
+is_recursive = G__3620;
 continue;
 }
 } else
 {if(cljs.reader.comment_prefix_QMARK_.call(null,ch))
 {{
-var G__3572 = cljs.reader.read_comment.call(null,reader,ch);
-var G__3573 = eof_is_error;
-var G__3574 = sentinel;
-var G__3575 = is_recursive;
-reader = G__3572;
-eof_is_error = G__3573;
-sentinel = G__3574;
-is_recursive = G__3575;
+var G__3621 = cljs.reader.read_comment.call(null,reader,ch);
+var G__3622 = eof_is_error;
+var G__3623 = sentinel;
+var G__3624 = is_recursive;
+reader = G__3621;
+eof_is_error = G__3622;
+sentinel = G__3623;
+is_recursive = G__3624;
 continue;
 }
 } else
@@ -851,14 +1136,14 @@ continue;
 var res = (cljs.core.truth_(f)?f.call(null,reader,ch):((cljs.reader.number_literal_QMARK_.call(null,reader,ch))?cljs.reader.read_number.call(null,reader,ch):(("\uFDD0'else")?cljs.reader.read_symbol.call(null,reader,ch):null)));
 if((res === reader))
 {{
-var G__3576 = reader;
-var G__3577 = eof_is_error;
-var G__3578 = sentinel;
-var G__3579 = is_recursive;
-reader = G__3576;
-eof_is_error = G__3577;
-sentinel = G__3578;
-is_recursive = G__3579;
+var G__3625 = reader;
+var G__3626 = eof_is_error;
+var G__3627 = sentinel;
+var G__3628 = is_recursive;
+reader = G__3625;
+eof_is_error = G__3626;
+sentinel = G__3627;
+is_recursive = G__3628;
 continue;
 }
 } else
@@ -877,7 +1162,7 @@ break;
 * Reads one object from the string s
 */
 cljs.reader.read_string = (function read_string(s){
-var r = cljs.reader.push_back_reader.call(null,s);
+var r = cljs.core.push_back_reader.call(null,s);
 return cljs.reader.read.call(null,r,true,null,false);
 });
 cljs.reader.zero_fill_right = (function zero_fill_right(s,width){
@@ -892,8 +1177,8 @@ if(cljs.core._EQ_.call(null,width,cljs.core.count.call(null,s)))
 while(true){
 if((b.getLength() < width))
 {{
-var G__3580 = b.append("0");
-b = G__3580;
+var G__3629 = b.append("0");
+b = G__3629;
 continue;
 }
 } else
@@ -942,54 +1227,54 @@ if(and__3822__auto__)
 }
 })())
 {} else
-{throw (new Error([cljs.core.str("Assert failed: "),cljs.core.str([cljs.core.str(msg),cljs.core.str(" Failed:  "),cljs.core.str(low),cljs.core.str("<="),cljs.core.str(n),cljs.core.str("<="),cljs.core.str(high)].join('')),cljs.core.str("\n"),cljs.core.str(cljs.core.pr_str.call(null,cljs.core.with_meta(cljs.core.list("\uFDD1'<=","\uFDD1'low","\uFDD1'n","\uFDD1'high"),cljs.core.hash_map("\uFDD0'line",474))))].join('')));
+{throw (new Error([cljs.core.str("Assert failed: "),cljs.core.str([cljs.core.str(msg),cljs.core.str(" Failed:  "),cljs.core.str(low),cljs.core.str("<="),cljs.core.str(n),cljs.core.str("<="),cljs.core.str(high)].join('')),cljs.core.str("\n"),cljs.core.str(cljs.core.pr_str.call(null,cljs.core.with_meta(cljs.core.list("\uFDD1'<=","\uFDD1'low","\uFDD1'n","\uFDD1'high"),cljs.core.hash_map("\uFDD0'line",583))))].join('')));
 }
 return n;
 });
 return (function (ts){
 var temp__3974__auto__ = cljs.core.map.call(null,cljs.core.vec,cljs.core.split_at.call(null,8,cljs.core.re_matches.call(null,timestamp,ts)));
 if(cljs.core.truth_(temp__3974__auto__))
-{var vec__3585 = temp__3974__auto__;
-var vec__3586 = cljs.core.nth.call(null,vec__3585,0,null);
-var _ = cljs.core.nth.call(null,vec__3586,0,null);
-var years = cljs.core.nth.call(null,vec__3586,1,null);
-var months = cljs.core.nth.call(null,vec__3586,2,null);
-var days = cljs.core.nth.call(null,vec__3586,3,null);
-var hours = cljs.core.nth.call(null,vec__3586,4,null);
-var minutes = cljs.core.nth.call(null,vec__3586,5,null);
-var seconds = cljs.core.nth.call(null,vec__3586,6,null);
-var milliseconds = cljs.core.nth.call(null,vec__3586,7,null);
-var vec__3587 = cljs.core.nth.call(null,vec__3585,1,null);
-var ___$1 = cljs.core.nth.call(null,vec__3587,0,null);
-var ___$2 = cljs.core.nth.call(null,vec__3587,1,null);
-var ___$3 = cljs.core.nth.call(null,vec__3587,2,null);
-var V = vec__3585;
-var vec__3588 = cljs.core.map.call(null,(function (v){
-return cljs.core.map.call(null,(function (p1__3584_SHARP_){
-return parseInt(p1__3584_SHARP_,10);
+{var vec__3634 = temp__3974__auto__;
+var vec__3635 = cljs.core.nth.call(null,vec__3634,0,null);
+var _ = cljs.core.nth.call(null,vec__3635,0,null);
+var years = cljs.core.nth.call(null,vec__3635,1,null);
+var months = cljs.core.nth.call(null,vec__3635,2,null);
+var days = cljs.core.nth.call(null,vec__3635,3,null);
+var hours = cljs.core.nth.call(null,vec__3635,4,null);
+var minutes = cljs.core.nth.call(null,vec__3635,5,null);
+var seconds = cljs.core.nth.call(null,vec__3635,6,null);
+var milliseconds = cljs.core.nth.call(null,vec__3635,7,null);
+var vec__3636 = cljs.core.nth.call(null,vec__3634,1,null);
+var ___$1 = cljs.core.nth.call(null,vec__3636,0,null);
+var ___$2 = cljs.core.nth.call(null,vec__3636,1,null);
+var ___$3 = cljs.core.nth.call(null,vec__3636,2,null);
+var V = vec__3634;
+var vec__3637 = cljs.core.map.call(null,(function (v){
+return cljs.core.map.call(null,(function (p1__3633_SHARP_){
+return parseInt(p1__3633_SHARP_,10);
 }),v);
-}),cljs.core.map.call(null,(function (p1__3582_SHARP_,p2__3581_SHARP_){
-return cljs.core.update_in.call(null,p2__3581_SHARP_,cljs.core.PersistentVector.fromArray([0], true),p1__3582_SHARP_);
-}),cljs.core.PersistentVector.fromArray([cljs.core.constantly.call(null,null),(function (p1__3583_SHARP_){
-if(cljs.core._EQ_.call(null,p1__3583_SHARP_,"-"))
+}),cljs.core.map.call(null,(function (p1__3631_SHARP_,p2__3630_SHARP_){
+return cljs.core.update_in.call(null,p2__3630_SHARP_,cljs.core.PersistentVector.fromArray([0], true),p1__3631_SHARP_);
+}),cljs.core.PersistentVector.fromArray([cljs.core.constantly.call(null,null),(function (p1__3632_SHARP_){
+if(cljs.core._EQ_.call(null,p1__3632_SHARP_,"-"))
 {return "-1";
 } else
 {return "1";
 }
 })], true),V));
-var vec__3589 = cljs.core.nth.call(null,vec__3588,0,null);
-var ___$4 = cljs.core.nth.call(null,vec__3589,0,null);
-var y = cljs.core.nth.call(null,vec__3589,1,null);
-var mo = cljs.core.nth.call(null,vec__3589,2,null);
-var d = cljs.core.nth.call(null,vec__3589,3,null);
-var h = cljs.core.nth.call(null,vec__3589,4,null);
-var m = cljs.core.nth.call(null,vec__3589,5,null);
-var s = cljs.core.nth.call(null,vec__3589,6,null);
-var ms = cljs.core.nth.call(null,vec__3589,7,null);
-var vec__3590 = cljs.core.nth.call(null,vec__3588,1,null);
-var offset_sign = cljs.core.nth.call(null,vec__3590,0,null);
-var offset_hours = cljs.core.nth.call(null,vec__3590,1,null);
-var offset_minutes = cljs.core.nth.call(null,vec__3590,2,null);
+var vec__3638 = cljs.core.nth.call(null,vec__3637,0,null);
+var ___$4 = cljs.core.nth.call(null,vec__3638,0,null);
+var y = cljs.core.nth.call(null,vec__3638,1,null);
+var mo = cljs.core.nth.call(null,vec__3638,2,null);
+var d = cljs.core.nth.call(null,vec__3638,3,null);
+var h = cljs.core.nth.call(null,vec__3638,4,null);
+var m = cljs.core.nth.call(null,vec__3638,5,null);
+var s = cljs.core.nth.call(null,vec__3638,6,null);
+var ms = cljs.core.nth.call(null,vec__3638,7,null);
+var vec__3639 = cljs.core.nth.call(null,vec__3637,1,null);
+var offset_sign = cljs.core.nth.call(null,vec__3639,0,null);
+var offset_hours = cljs.core.nth.call(null,vec__3639,1,null);
+var offset_minutes = cljs.core.nth.call(null,vec__3639,2,null);
 var offset = (offset_sign * ((offset_hours * 60) + offset_minutes));
 return cljs.core.PersistentVector.fromArray([((cljs.core.not.call(null,years))?1970:y),((cljs.core.not.call(null,months))?1:check.call(null,1,mo,12,"timestamp month field must be in range 1..12")),((cljs.core.not.call(null,days))?1:check.call(null,1,d,cljs.reader.days_in_month.call(null,mo,cljs.reader.leap_year_QMARK_.call(null,y)),"timestamp day field must be in range 1..last day in month")),((cljs.core.not.call(null,hours))?0:check.call(null,0,h,23,"timestamp hour field must be in range 0..23")),((cljs.core.not.call(null,minutes))?0:check.call(null,0,m,59,"timestamp minute field must be in range 0..59")),((cljs.core.not.call(null,seconds))?0:check.call(null,0,s,((cljs.core._EQ_.call(null,m,59))?60:59),"timestamp second field must be in range 0..60")),((cljs.core.not.call(null,milliseconds))?0:check.call(null,0,ms,999,"timestamp millisecond field must be in range 0..999")),offset], true);
 } else
@@ -1000,15 +1285,15 @@ return cljs.core.PersistentVector.fromArray([((cljs.core.not.call(null,years))?1
 cljs.reader.parse_timestamp = (function parse_timestamp(ts){
 var temp__3971__auto__ = cljs.reader.parse_and_validate_timestamp.call(null,ts);
 if(cljs.core.truth_(temp__3971__auto__))
-{var vec__3592 = temp__3971__auto__;
-var years = cljs.core.nth.call(null,vec__3592,0,null);
-var months = cljs.core.nth.call(null,vec__3592,1,null);
-var days = cljs.core.nth.call(null,vec__3592,2,null);
-var hours = cljs.core.nth.call(null,vec__3592,3,null);
-var minutes = cljs.core.nth.call(null,vec__3592,4,null);
-var seconds = cljs.core.nth.call(null,vec__3592,5,null);
-var ms = cljs.core.nth.call(null,vec__3592,6,null);
-var offset = cljs.core.nth.call(null,vec__3592,7,null);
+{var vec__3641 = temp__3971__auto__;
+var years = cljs.core.nth.call(null,vec__3641,0,null);
+var months = cljs.core.nth.call(null,vec__3641,1,null);
+var days = cljs.core.nth.call(null,vec__3641,2,null);
+var hours = cljs.core.nth.call(null,vec__3641,3,null);
+var minutes = cljs.core.nth.call(null,vec__3641,4,null);
+var seconds = cljs.core.nth.call(null,vec__3641,5,null);
+var ms = cljs.core.nth.call(null,vec__3641,6,null);
+var offset = cljs.core.nth.call(null,vec__3641,7,null);
 return (new Date((Date.UTC(years,(months - 1),days,hours,minutes,seconds,ms) - ((offset * 60) * 1000))));
 } else
 {return cljs.reader.reader_error.call(null,null,[cljs.core.str("Unrecognized date/time syntax: "),cljs.core.str(ts)].join(''));
@@ -1058,3 +1343,6 @@ var old_parser = cljs.core._lookup.call(null,cljs.core.deref.call(null,cljs.read
 cljs.core.swap_BANG_.call(null,cljs.reader._STAR_tag_table_STAR_,cljs.core.dissoc,tag__$1);
 return old_parser;
 });
+
+// Analyzer namespace snapshot:
+cljs.core.swap_BANG_.call(null,cljs.core.namespaces,cljs.core.assoc,"\uFDD1'cljs.reader",cljs.core.hash_map("\uFDD0'defs",cljs.core.hash_map("\uFDD1'read-2-chars",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'reader"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'reader","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-2-chars","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",154,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'read-unquote",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'rdr","\uFDD1'_"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'_","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-unquote","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",463,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'read-4-chars",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'reader"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'reader","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-4-chars","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",160,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'indivisible?",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'num","\uFDD1'div"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'num","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'div","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/indivisible?","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",564,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1're-find*",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1're","\uFDD1's"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1're","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1's","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/re-find*","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",83,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'throwing-reader",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'msg"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'msg","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/throwing-reader","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",335,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'ratio-pattern",cljs.core.hash_map("\uFDD0'line",79,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'name","\uFDD1'cljs.reader/ratio-pattern"),"\uFDD1'number-literal?",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'reader","\uFDD1'initch"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'reader","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'initch","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/number-literal?","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'doc","Checks whether the reader is at the start of a number literal","\uFDD0'line",32,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'tag","\uFDD1'boolean"),"\uFDD1'wrapping-reader",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'sym"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'sym","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/wrapping-reader","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",330,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'escape-char",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'buffer","\uFDD1'reader"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'buffer","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'reader","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/escape-char","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",180,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'read-list",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'rdr","\uFDD1'_"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'_","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-list","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",251,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'parse-timestamp",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'ts"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'ts","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/parse-timestamp","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",606,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'desugar-meta",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'f"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'f","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/desugar-meta","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",322,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'macros",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'c"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'c","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/macros","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",493,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'read-queue",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'elems"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'elems","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-queue","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",622,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'leap-year?",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'year"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'year","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/leap-year?","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",568,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'reader-error",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'rdr","\uFDD1'&","\uFDD1'msg"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'msg","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/reader-error","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",true,"\uFDD0'line",49,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'comment-prefix?",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'ch"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'ch","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/comment-prefix?","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'doc","Checks whether the character begins a comment.","\uFDD0'line",27,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'tag","\uFDD1'boolean"),"\uFDD1'read-map",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'rdr","\uFDD1'_"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'_","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-map","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",261,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'read",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'reader","\uFDD1'eof-is-error","\uFDD1'sentinel","\uFDD1'is-recursive"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'reader","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'eof-is-error","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'sentinel","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'is-recursive","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",4,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'doc","Reads the first object from a PushbackReader. Returns the object read.\n   If EOF, throws if eof-is-error is true. Otherwise returns sentinel.","\uFDD0'line",524,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'UNQUOTE-SPICING",cljs.core.hash_map("\uFDD0'line",351,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'name","\uFDD1'cljs.reader/UNQUOTE-SPICING"),"\uFDD1'read-set",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'rdr","\uFDD1'_"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'_","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-set","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",480,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'isUnquoteSplicing?",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'form"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'form","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/isUnquoteSplicing?","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",359,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'zero-fill-right",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1's","\uFDD1'width"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1's","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'width","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/zero-fill-right","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",552,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'read-comment",cljs.core.hash_map("\uFDD0'line",255,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'name","\uFDD1'cljs.reader/read-comment"),"\uFDD1'read-symbol",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'reader","\uFDD1'initch"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'reader","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'initch","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-symbol","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",298,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'parse-and-validate-timestamp",cljs.core.hash_map("\uFDD0'line",580,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'private",true,"\uFDD0'name","\uFDD1'cljs.reader/parse-and-validate-timestamp"),"\uFDD1'read-string",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1's"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1's","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-string","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'doc","Reads one object from the string s","\uFDD0'line",543,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'read-meta",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'rdr","\uFDD1'_"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'_","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-meta","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",340,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'special-symbols",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1't","\uFDD1'not-found"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1't","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'not-found","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/special-symbols","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",291,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'read-uuid",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'uuid"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'uuid","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-uuid","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",629,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'divisible?",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'num","\uFDD1'div"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'num","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'div","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/divisible?","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",560,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'make-unicode-char",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'code-str"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'code-str","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/make-unicode-char","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",176,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'read-number",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'reader","\uFDD1'initch"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'reader","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'initch","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-number","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",268,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'read-delimited-list",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'delim","\uFDD1'rdr","\uFDD1'recursive?"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'delim","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'recursive?","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-delimited-list","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",3,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",212,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'UNQUOTE",cljs.core.hash_map("\uFDD0'line",350,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'name","\uFDD1'cljs.reader/UNQUOTE"),"\uFDD1'maybe-read-tagged-type",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'rdr","\uFDD1'initch"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'initch","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/maybe-read-tagged-type","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",639,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'*gensym-env*",cljs.core.hash_map("\uFDD0'line",354,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'dynamic",true,"\uFDD0'name","\uFDD1'cljs.reader/*gensym-env*"),"\uFDD1'days-in-month",cljs.core.hash_map("\uFDD0'line",574,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'private",true,"\uFDD0'name","\uFDD1'cljs.reader/days-in-month"),"\uFDD1'not-implemented",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'rdr","\uFDD1'ch"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'ch","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/not-implemented","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",231,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'whitespace?",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'ch"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'ch","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/whitespace?","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'doc","Checks whether a given character is whitespace","\uFDD0'line",17,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'tag","\uFDD1'boolean"),"\uFDD1'validate-unicode-escape",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'unicode-pattern","\uFDD1'reader","\uFDD1'escape-char","\uFDD1'unicode-str"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'unicode-pattern","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'reader","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'escape-char","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'unicode-str","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/validate-unicode-escape","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",4,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",171,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'escape-char-map",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'c"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'c","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/escape-char-map","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",139,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'isUnquote?",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'form"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'form","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/isUnquote?","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",356,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1're-matches*",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1're","\uFDD1's"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1're","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1's","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/re-matches*","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",123,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'symbol-pattern",cljs.core.hash_map("\uFDD0'line",81,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'name","\uFDD1'cljs.reader/symbol-pattern"),"\uFDD1'read-discard",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'rdr","\uFDD1'_"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'_","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-discard","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",488,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'match-int",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1's"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1's","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/match-int","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",91,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'read-vector",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'rdr","\uFDD1'_"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'_","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-vector","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",257,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'dispatch-macros",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1's"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1's","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/dispatch-macros","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",515,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'*tag-table*",cljs.core.hash_map("\uFDD0'line",635,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'name","\uFDD1'cljs.reader/*tag-table*"),"\uFDD1'syntaxQuote",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'form"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'form","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/syntaxQuote","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",376,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'int-pattern",cljs.core.hash_map("\uFDD0'line",78,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'name","\uFDD1'cljs.reader/int-pattern"),"\uFDD1'read-keyword",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'reader","\uFDD1'initch"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'reader","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'initch","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-keyword","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",306,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'sqExpandList",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'sq"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'sq","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/sqExpandList","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",362,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'read-unmatched-delimiter",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'rdr","\uFDD1'ch"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'ch","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-unmatched-delimiter","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",247,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'match-float",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1's"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1's","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/match-float","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",119,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'match-ratio",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1's"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1's","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/match-ratio","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",112,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'read-syntax-quote",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'rdr","\uFDD1'_"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'_","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-syntax-quote","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",457,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'read-past",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'pred","\uFDD1'rdr"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'pred","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-past","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'doc","Read until first character that doesn't match pred, returning\n   char.","\uFDD0'line",203,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'skip-line",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'reader","\uFDD1'_"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'reader","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'_","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/skip-line","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'doc","Advances the reader to the end of a line. Returns the reader","\uFDD0'line",69,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'macro-terminating?",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'ch"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'ch","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/macro-terminating?","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",53,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'tag","\uFDD1'boolean"),"\uFDD1'read-string*",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'reader","\uFDD1'_"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'reader","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'_","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-string*","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",280,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'read-token",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'rdr","\uFDD1'initch"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'initch","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-token","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",59,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'read-dispatch",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'rdr","\uFDD1'_"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'_","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-dispatch","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",237,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'deregister-tag-parser!",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'tag"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'tag","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/deregister-tag-parser!","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",655,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'match-number",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1's"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1's","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/match-number","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",132,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'unicode-4-pattern",cljs.core.hash_map("\uFDD0'line",169,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'name","\uFDD1'cljs.reader/unicode-4-pattern"),"\uFDD1'read-regex",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'rdr","\uFDD1'ch"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'rdr","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'ch","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-regex","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",484,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'register-tag-parser!",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'tag","\uFDD1'f"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'tag","\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name","\uFDD1'f","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/register-tag-parser!","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",648,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'numeric?",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1'ch"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1'ch","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/numeric?","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'doc","Checks whether a given character is numeric","\uFDD0'line",22,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'tag","\uFDD1'boolean"),"\uFDD1'read-date",cljs.core.hash_map("\uFDD0'arglists",cljs.core.list("\uFDD1'quote",cljs.core.list(cljs.core.vec(["\uFDD1's"]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name","\uFDD1's","\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name","\uFDD1'cljs.reader/read-date","\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",615,"\uFDD0'fn-var",true,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs"),"\uFDD1'unicode-2-pattern",cljs.core.hash_map("\uFDD0'line",168,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'name","\uFDD1'cljs.reader/unicode-2-pattern"),"\uFDD1'float-pattern",cljs.core.hash_map("\uFDD0'line",80,"\uFDD0'file","/home/joelm/scratch/sources/clojurescript/src/cljs/cljs/reader.cljs","\uFDD0'name","\uFDD1'cljs.reader/float-pattern")),"\uFDD0'imports",null,"\uFDD0'uses-macros",null,"\uFDD0'requires",cljs.core.hash_map("\uFDD1'ana","\uFDD1'cljs.analyzer","\uFDD1'gstring","\uFDD1'goog.string"),"\uFDD0'uses",null,"\uFDD0'excludes",cljs.core.set([]),"\uFDD0'doc",null,"\uFDD0'name","\uFDD1'cljs.reader"));
