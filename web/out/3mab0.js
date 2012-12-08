@@ -143,8 +143,8 @@ if(cljs.core._EQ_.call(null,e.message,"EOF while reading"))
 });
 cljs.core.println.call(null,";; ClojureScript");
 webrepl.append_dom.call(null,log,cljs.core.PersistentVector.fromArray(["\uFDD0'div",cljs.core.ObjMap.fromObject(["\uFDD0'class"],{"\uFDD0'class":"cg"}),";;   - ",cljs.core.PersistentVector.fromArray(["\uFDD0'a",cljs.core.ObjMap.fromObject(["\uFDD0'href"],{"\uFDD0'href":"http://github.com/kanaka/clojurescript"}),"http://github.com/kanaka/clojurescript"], true)], true));
-cljs.core.println.call(null,";;   - A port of the ClojureScript to ClojureScript");
-cljs.core.println.call(null,";;   - No macros (yet)");
+cljs.core.println.call(null,";;   - A port of the ClojureScript compiler to ClojureScript");
+cljs.core.println.call(null,";;   - No predefined macros (yet), but defmacro works.");
 webrepl.pep.call(null,log,"(+ 1 2)");
 webrepl.pep.call(null,log,"(def sqr (fn* [x] (* x x)))");
 webrepl.pep.call(null,log,"(sqr 8)");
