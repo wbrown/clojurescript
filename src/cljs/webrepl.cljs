@@ -1,9 +1,10 @@
 (ns webrepl
   (:require [cljs.core]
-            [bs :as bs]
             [cljs.analyzer :as ana]
             [cljs.compiler :as comp]
             [cljs.reader :as reader]))
+
+(defn prompt [] (str ana/*cljs-ns* "=> "))
 
 (def append-dom)
 
@@ -42,7 +43,7 @@
     [:table
      [:tbody
       [:tr
-       [:td {:class "cg"} "user=> "]
+       [:td {:class "cg"} (prompt)]
        [:td (.replace text #"\n$" "")]]]]))
 
 #_(defmacro print-with-class [c m]
