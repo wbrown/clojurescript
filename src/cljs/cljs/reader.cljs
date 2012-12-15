@@ -71,7 +71,7 @@
   [reader _]
   (loop []
     (let [ch (read-char reader)]
-      (if (or (identical? ch \n) (identical? ch \r) (nil? ch))
+      (if (or (identical? ch "\n") (identical? ch "\r") (nil? ch))
         reader
         (recur)))))
 
@@ -246,7 +246,7 @@
 
 (defn read-unmatched-delimiter
   [rdr ch]
-  (reader-error rdr "Unmached delimiter " ch))
+  (reader-error rdr "Unmatched delimiter " ch))
 
 (defn read-list
   [rdr _]
@@ -348,10 +348,11 @@
         (reader-error rdr "Metadata can only be applied to IWithMetas")))))
 
 (def UNQUOTE :__thisInternalKeywordRepresentsUnquoteToTheReader__)
-(def UNQUOTE-SPICING :__thisInternalKeywordRepresentsUnquoteSplicingToTheReader__)
+(def UNQUOTE-SPLICING :__thisInternalKeywordRepresentsUnquoteSplicingToTheReader__)
 
 (declare syntaxQuote)
 (def ^:dynamic *gensym-env* (atom nil))
+(def ^:dynamic *arg-env* (atom nil))
 
 (defn isUnquote? [form]
   (and (satisfies? ISeq form) (= (first form) UNQUOTE)))
@@ -370,8 +371,7 @@
         (second item)
   
         :else
-        (list 'list (syntaxQuote item))
-        ))))
+        (list 'list (syntaxQuote item))))))
 
 (defn syntaxQuote [form]
   (cond
@@ -421,6 +421,10 @@
     ;; (isUnquoteSplicing(form))
     (isUnquoteSplicing? form)
     (reader-error rdr "Reader ~@ splice not in list")
+
+    ;; TODO: figure out why nil is mapping to IMap
+    (nil? form)
+    (list 'quote form)
 
     ;; (form instanceof IPersistentCollection)
     (satisfies? ICollection form)
@@ -477,6 +481,65 @@
         (let [o (read rdr true nil true)]
           (list UNQUOTE o))))))
 
+(defn garg [n]
+  (let [pre (if (= n -1) "rest" (str "p" n))]
+    (symbol (str (gensym pre) "#"))))
+
+(defn read-fn
+  [rdr _]
+  (when @*arg-env*
+    (reader-error nil "nested #()s are not allowed"))
+  (binding [*arg-env* (atom (sorted-map))]
+    (unread rdr "(")  ;) - the wink towards vim paren matching
+    (let [form (read rdr true nil true)
+          argsyms @*arg-env*
+          rargs (rseq argsyms)
+          highpair (first rargs)
+          higharg (if highpair (key highpair) 0)
+          args (if (> higharg 0)
+                 (doall (for [i (range 1 (+ 1 higharg))]
+                          (or (get argsyms i)
+                              (garg i))))
+                 args)
+          restsym (get argsyms -1)
+          args (if restsym
+                 (concat args ['& restsym])
+                 args)]
+      ;(println "here1" (list 'fn* (vec args) form))
+      (list 'fn* (vec args) form))))
+
+(defn registerArg [n]
+  (let [argsyms @*arg-env*]
+    (when-not argsyms (reader-error _ "arg literal not in #()"))
+    (let [ret (get argsyms n)]
+      (if ret
+        ret
+        (let [ret (garg n)]
+          (swap! *arg-env* assoc n ret)
+          ret)))))
+
+(defn read-arg
+  [rdr pct]
+  (if (not @*arg-env*)
+    (read-symbol rdr "%")
+    (let [ch (read-char rdr)]
+      (unread rdr ch)
+      ;; % alone is first arg
+      (if (or (nil? ch)
+                (whitespace? ch)
+                (macro-terminating? ch))
+        (registerArg 1)
+        (let [n (read rdr true nil true)]
+          (cond
+            (= '& n) 
+            (registerArg -1)
+  
+            (not (number? n))
+            (throw (js/Error. "arg literal must be %, %& or %integer"))
+  
+            :else
+            (registerArg (int n))))))))
+
 (defn read-set
   [rdr _]
   (set (read-delimited-list "}" rdr true)))
@@ -494,7 +557,7 @@
   (cond
    (identical? c \") read-string*
    (identical? c \:) read-keyword
-   (identical? c \;) not-implemented ;; never hit this
+   (identical? c \;) read-comment
    (identical? c \') (wrapping-reader 'quote)
    (identical? c \@) (wrapping-reader 'deref)
    (identical? c \^) read-meta
@@ -507,7 +570,7 @@
    (identical? c \{) read-map
    (identical? c \}) read-unmatched-delimiter
    (identical? c \\) read-char
-   (identical? c \%) not-implemented
+   (identical? c \%) read-arg
    (identical? c \#) read-dispatch
    :else nil))
 
@@ -515,6 +578,7 @@
 (defn dispatch-macros [s]
   (cond
    (identical? s "{") read-set
+   (identical? s "(") read-fn
    (identical? s "<") (throwing-reader "Unreadable form")
    (identical? s "\"") read-regex
    (identical? s"!") read-comment
