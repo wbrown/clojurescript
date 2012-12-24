@@ -4,4 +4,4 @@ goog.addDependency("../clojure/string.js", ['clojure.string'], ['cljs.core', 'go
 goog.addDependency("../cljs/analyzer.js", ['cljs.analyzer'], ['cljs.core', 'clojure.string']);
 goog.addDependency("../cljs/reader.js", ['cljs.reader'], ['cljs.analyzer', 'cljs.core', 'goog.string']);
 goog.addDependency("../cljs/compiler.js", ['cljs.compiler'], ['cljs.analyzer', 'cljs.core', 'clojure.string']);
-goog.addDependency("../Bg8pX.js", ['webrepl'], ['cljs.core', 'cljs.reader', 'cljs.compiler', 'cljs.analyzer', 'cljs.core']);
+goog.addDependency("../eKPUR.js", ['webrepl'], ['cljs.core', 'cljs.reader', 'cljs.compiler', 'cljs.analyzer', 'cljs.core']);
