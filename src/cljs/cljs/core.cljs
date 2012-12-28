@@ -1768,7 +1768,8 @@ reduces them without incurring seq initialization"
   (-equiv [o other]
     (or (identical? o other)
         (and (symbol? other)
-             (= sym (name other)))))
+             (= (goog.string/hashCode (str* "\uFDD1" "'" o))
+                (hash other)))))
 
   ILookup
   (-lookup [sym k] nil)
@@ -7361,6 +7362,20 @@ nil if the end of stream has been reached")
 (def namespaces (atom '{cljs.core {:name cljs.core}
                         cljs.user {:name cljs.user}}))
 
+(declare ^:dynamic *ns*)
+
+;; Implicitly depends on cljs.compiler
+(defn create-ns [ns-sym]
+  (let [msym (cljs.compiler/munge ns-sym)]
+      (js/eval (str "try { " msym "; } catch (e) { " msym " = {}; }"))))
+
+;; Implicitly depends on cljs.analyzer
+(defn in-ns [name]
+  (assert name "Unable to resolve namespace name")
+  (set! cljs.analyzer/*cljs-ns* name)
+  (set! *ns* name)
+  nil)
+
 ;; Implicitly depends on cljs.analyzer
 (defn setMacro [sym]
  (let [ns (symbol (or (namespace sym)
@@ -7581,26 +7596,23 @@ nil if the end of stream has been reached")
       `(cljs.core/let [or# ~x]
          (if or# or# (cljs.core/or ~@next)))))
 
-;; TODO: get this working
-;; (clj-defmacro ..
-;;   "form => fieldName-symbol or (instanceMethodName-symbol args*)
-;; 
-;;   Expands into a member access (.) of the first member on the first
-;;   argument, followed by the next member on the result, etc. For
-;;   instance:
-;; 
-;;   (.. System (getProperties) (get \"os.name\"))
-;; 
-;;   expands to:
-;; 
-;;   (. (. System (getProperties)) (get \"os.name\"))
-;; 
-;;   but is easier to write, read, and understand."
-;;   {:added "1.0"}
-;;   ([x form] `(. ~x ~form))
-;;   ([x form & more] `(.. (. ~x ~form) ~@more)))
+(clj-defmacro ..
+  "form => fieldName-symbol or (instanceMethodName-symbol args*)
 
+  Expands into a member access (.) of the first member on the first
+  argument, followed by the next member on the result, etc. For
+  instance:
 
+  (.. System (getProperties) (get \"os.name\"))
+
+  expands to:
+
+  (. (. System (getProperties)) (get \"os.name\"))
+
+  but is easier to write, read, and understand."
+  {:added "1.0"}
+  ([x form] `(. ~x ~form))
+  ([x form & more] `(cljs.core/.. (. ~x ~form) ~@more)))
 
 (clj-defmacro ->
   "Threads the expr through the forms. Inserts x as the
@@ -7934,16 +7946,19 @@ nil if the end of stream has been reached")
 (defn to-property [sym]
   (symbol (cljs.core/str "-" sym)))
 
+(defn- parse-impls [specs]
+  (loop [ret {} s specs]
+    (if (seq s)
+      (recur (assoc ret (first s) (take-while seq? (next s)))
+             (drop-while seq? (next s)))
+      ret)))
+
 ;; Implicitly depends on cljs.compiler namespace
 (clj-defmacro extend-type [tsym & impls]
   (let [resolve #(let [ret (:name (cljs.analyzer/resolve-var (dissoc &env :locals) %))]
                    (assert ret (cljs.core/str "Can't resolve: " %))
                    ret)
-        impl-map (loop [ret {} s impls]
-                   (if (seq s)
-                     (recur (assoc ret (first s) (take-while seq? (next s)))
-                            (drop-while seq? (next s)))
-                     ret))
+        impl-map (parse-impls impls)
         warn-if-not-protocol #(when-not (= 'Object %)
                                 (if cljs.analyzer/*cljs-warn-on-undeclared*
                                   (if-let [var (cljs.analyzer/resolve-existing-var (dissoc &env :locals) %)]
@@ -7976,9 +7991,7 @@ nil if the end of stream has been reached")
         `(do ~@(mapcat assign-impls impl-map)))
       (let [t (resolve tsym)
             prototype-prefix (fn [sym]
-                               ;; TODO: restore .. form when it works
-                               ;;`(.. ~tsym -prototype ~(to-property sym))
-                               `(. (.-prototype ~tsym) ~(to-property sym)))
+                               `(cljs.core/.. ~tsym -prototype ~(to-property sym)))
             assign-impls (fn [[p sigs]]
                            (warn-if-not-protocol p)
                            (let [psym (resolve p)
@@ -8260,6 +8273,54 @@ nil if the end of stream has been reached")
        ~@(map method methods)
        (set! ~'*unchecked-if* false))))
 
+;; extend-protyocol actually comes from Clojure core.clj but really
+;; wants to be here in the file
+(defn- emit-extend-protocol [p specs]
+  (let [impls (parse-impls specs)]
+    `(do
+       ~@(map (fn [[t fs]]
+                `(cljs.core/extend-type ~t ~p ~@fs))
+              impls))))
+
+(clj-defmacro extend-protocol
+  "Useful when you want to provide several implementations of the same
+  protocol all at once. Takes a single protocol and the implementation
+  of that protocol for one or more types. Expands into calls to
+  extend-type:
+
+  (extend-protocol Protocol
+    AType
+      (foo [x] ...)
+      (bar [x y] ...)
+    BType
+      (foo [x] ...)
+      (bar [x y] ...)
+    AClass
+      (foo [x] ...)
+      (bar [x y] ...)
+    nil
+      (foo [x] ...)
+      (bar [x y] ...))
+
+  expands into:
+
+  (do
+   (clojure.core/extend-type AType Protocol
+     (foo [x] ...)
+     (bar [x y] ...))
+   (clojure.core/extend-type BType Protocol
+     (foo [x] ...)
+     (bar [x y] ...))
+   (clojure.core/extend-type AClass Protocol
+     (foo [x] ...)
+     (bar [x y] ...))
+   (clojure.core/extend-type nil Protocol
+     (foo [x] ...)
+     (bar [x y] ...)))"
+  {:added "1.2"}
+
+  [p & specs]
+  (emit-extend-protocol p specs))
 
 ;; Implicitly depends on cljs.analyzer and cljs.compiler namespace
 (clj-defmacro satisfies?

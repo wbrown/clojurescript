@@ -35,7 +35,7 @@
     "volatile" "while" "with" "yield" "methods"})
 
 (def ^:dynamic *position* nil)
-(def ^:dynamic *emitted-provides* nil)
+(def ^:dynamic *emitted-provides* (atom #{}))
 (def ^:dynamic *lexical-renames* {})
 (def cljs-reserved-file-names #{"deps.cljs"})
 
@@ -89,7 +89,8 @@
           munged-name
           (symbol (str munged-name "__$" depth))))
       ; String munging
-      (let [ss (string/replace (str s) #"/(.)" ".$1") ; Division is special
+      (let [ss (string/replace (str s) #"[.][.]" "_DOTDOT_") ; .. is special
+            ss (string/replace ss #"/(.)" ".$1") ; Division is special
             ss (string/join "." (map #(if (reserved %) (str % "$") %)
                                      (string/split ss #"[.]")))
             ms (apply str (map #(get CHAR_MAP % %) ss))]
@@ -628,7 +629,9 @@
     (when (= :expr context) (emits "})()"))))
 
 (defn protocol-prefix [psym]
-  (symbol (str (-> (str psym) (.replace \. \$) (.replace \/ \$)) "$")))
+  (symbol (str (-> (str psym)
+                   (.replace (js/RegExp. "\\." "g") \$)
+                   (.replace (js/RegExp. "\\/" "g") \$)) "$")))
 
 (defmethod emit :invoke
   [{:keys [f args env] :as expr}]
@@ -722,7 +725,7 @@
 (defmethod emit :ns
   [{:keys [name requires uses requires-macros env]}]
   (swap! ns-first-segments conj (first (string/split (str name) #"\.")))
-  (emitln "goog.provide('" (munge name) "');")
+  (emit-provide (munge name))
   (when-not (= name 'cljs.core)
     (emitln "goog.require('cljs.core');"))
   (doseq [lib (into (vals requires) (distinct (vals uses)))]
