@@ -7293,6 +7293,25 @@ nil if the end of stream has been reached")
   "Creates a StringPushbackReader from a given string"
   (StringPushbackReader. s (atom 0) (atom nil)))
 
+;;;;;;;;;;;;;;;;;;; File loading ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Implicitly depends on cljs.compiler namespace
+(defn load-file*
+  "Sequentially read and evaluate the set of forms contained in the
+  file. Returns a compile-forms* map that contains the emitted
+  JavaScript string (:emit-str) and the output (:output)."
+  [name]
+  (cljs.compiler/compile-forms*
+    (cljs.compiler/forms-seq name)))
+
+(defn load-file
+  "Sequentially read and evaluate the set of forms contained in the
+  file."
+  [name]
+  (let [lf (load-file* name)]
+    (print (:output lf))
+    (dissoc lf :output :emit-str)))
+
 ;;;;;;;;;;;;;;;;;; Destructuring ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn destructure [bindings]
@@ -7362,25 +7381,53 @@ nil if the end of stream has been reached")
 (def namespaces (atom '{cljs.core {:name cljs.core}
                         cljs.user {:name cljs.user}}))
 
-(declare ^:dynamic *ns*)
+(declare ^:dynamic *ns-sym*)
 
-;; Implicitly depends on cljs.compiler
-(defn create-ns [ns-sym]
-  (let [msym (cljs.compiler/munge ns-sym)]
-      (js/eval (str "try { " msym "; } catch (e) { " msym " = {}; }"))))
+(defn find-ns
+  "Returns the namespace named by the symbol or nil if it doesn't
+  exist."
+  [sym]
+  (@namespaces sym))
 
+(defn create-ns
+  "Create a new namespace named by the symbol if one doesn't already
+  exist, returns it or the already-existing namespace of the same
+  name."
+  [sym]
+  (let [ns (find-ns sym)]
+    (if ns
+      ns
+      (do
+        (swap! namespaces assoc-in [sym :name] sym)
+        (find-ns sym)))))
+
+;; TODO: this belongs in REPL environment only
 ;; Implicitly depends on cljs.analyzer
 (defn in-ns [name]
-  (assert name "Unable to resolve namespace name")
+  (assert (symbol? name) "Unable to resolve namespace name")
   (set! cljs.analyzer/*cljs-ns* name)
-  (set! *ns* name)
-  nil)
+  (set! *ns-sym* name))
+
+(defn ns-resolve
+  "Returns the \"var\" to which a symbol will be resolved in the
+  namespace, else nil."
+  {:added "1.0"
+   :static true}
+  [ns sym]
+  (get-in ns [:defs sym]))
+
+(defn resolve
+  "same as (ns-resolve (find-ns *ns-sym*) symbol)"
+  [sym]
+  (ns-resolve (find-ns *ns-sym*) sym))
 
 ;; Implicitly depends on cljs.analyzer
 (defn setMacro [sym]
  (let [ns (symbol (or (namespace sym)
+                      *ns-sym*
                       (try cljs.analyzer/*cljs-ns*
-                        (catch js/Error e 'cljs.core))))
+                        (catch js/Error e 'cljs.core))
+                      'cljs.core))
        name (symbol (name sym))]
    (swap! namespaces assoc-in [:macros ns name] true))
    nil)
@@ -7672,6 +7719,13 @@ nil if the end of stream has been reached")
          (cljs.core/let [~form temp#]
            ~@body)))))
 
+(clj-defmacro declare
+  "defs the supplied var names with no bindings, useful for making forward declarations."
+  {:added "1.0"}
+  [& names] `(do ~@(map #(list 'def (vary-meta % assoc :declared true)) names)))
+
+;; TODO: import?
+
 (clj-defmacro doto
   "Evaluates x then calls all of the methods and functions with the
   value of x supplied at the front of the given arguments.  The forms
@@ -7699,8 +7753,7 @@ nil if the end of stream has been reached")
   [name & args]
   (let [;; TODO: verify this works
         t (with-meta (gensym "target")
-            (meta name))
-       ]
+            (meta name))]
     `(cljs.core/fn [~t ~@args]
        (. ~t (~name ~@args)))))
 
@@ -7805,6 +7858,21 @@ nil if the end of stream has been reached")
   "Ignores body, yields nil"
   {:added "1.0"}
   [& body])
+
+(clj-defmacro defn-
+  "same as defn, yielding non-public def"
+  {:added "1.0"}
+  [name & decls]
+  ;; TODO: make this actually mean something
+  (list* `cljs.core/defn (with-meta name (assoc (meta name) :private true)) decls))
+
+(clj-defmacro defonce
+  "defs name to have the root value of the expr if the named var has
+  no root value, else expr is unevaluated"
+  {:added "1.0"}
+  [name expr]
+  `(cljs.core/when-not (cljs.core/resolve ~name)
+     (def ~name ~expr)))
 
 (clj-defmacro while
   "Repeatedly executes body while test expression is true. Presumes
@@ -7991,7 +8059,7 @@ nil if the end of stream has been reached")
         `(do ~@(mapcat assign-impls impl-map)))
       (let [t (resolve tsym)
             prototype-prefix (fn [sym]
-                               `(cljs.core/.. ~tsym -prototype ~(to-property sym)))
+                               `(cljs.core/.. ~tsym cljs.core/-prototype ~(to-property sym)))
             assign-impls (fn [[p sigs]]
                            (warn-if-not-protocol p)
                            (let [psym (resolve p)
@@ -8273,7 +8341,7 @@ nil if the end of stream has been reached")
        ~@(map method methods)
        (set! ~'*unchecked-if* false))))
 
-;; extend-protyocol actually comes from Clojure core.clj but really
+;; extend-protocol actually comes from Clojure core.clj but really
 ;; wants to be here in the file
 (defn- emit-extend-protocol [p specs]
   (let [impls (parse-impls specs)]
