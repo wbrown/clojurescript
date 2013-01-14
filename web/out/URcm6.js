@@ -11,26 +11,26 @@ return [cljs.core.str(cljs.analyzer._STAR_cljs_ns_STAR_),cljs.core.str("=> ")].j
 });
 webrepl.dom = (function dom(o){
 if(cljs.core.coll_QMARK_.call(null,o))
-{var vec__3109 = o;
-var tag = cljs.core.nth.call(null,vec__3109,0,null);
-var attrs = cljs.core.nth.call(null,vec__3109,1,null);
-var body = cljs.core.nthnext.call(null,vec__3109,2);
+{var vec__3140 = o;
+var tag = cljs.core.nth.call(null,vec__3140,0,null);
+var attrs = cljs.core.nth.call(null,vec__3140,1,null);
+var body = cljs.core.nthnext.call(null,vec__3140,2);
 if(cljs.core.keyword_QMARK_.call(null,tag))
 {var elem = document.createElement(cljs.core.name.call(null,tag));
 if(cljs.core.map_QMARK_.call(null,attrs))
-{var G__3110_3112 = cljs.core.seq.call(null,attrs);
+{var G__3141_3143 = cljs.core.seq.call(null,attrs);
 while(true){
-if(G__3110_3112)
-{var vec__3111_3113 = cljs.core.first.call(null,G__3110_3112);
-var k_3114 = cljs.core.nth.call(null,vec__3111_3113,0,null);
-var v_3115 = cljs.core.nth.call(null,vec__3111_3113,1,null);
-if(cljs.core.truth_(v_3115))
-{elem.setAttribute(cljs.core.name.call(null,k_3114),v_3115);
+if(G__3141_3143)
+{var vec__3142_3144 = cljs.core.first.call(null,G__3141_3143);
+var k_3145 = cljs.core.nth.call(null,vec__3142_3144,0,null);
+var v_3146 = cljs.core.nth.call(null,vec__3142_3144,1,null);
+if(cljs.core.truth_(v_3146))
+{elem.setAttribute(cljs.core.name.call(null,k_3145),v_3146);
 } else
 {}
 {
-var G__3116 = cljs.core.next.call(null,G__3110_3112);
-G__3110_3112 = G__3116;
+var G__3147 = cljs.core.next.call(null,G__3141_3143);
+G__3141_3143 = G__3147;
 continue;
 }
 } else
@@ -52,14 +52,14 @@ return cljs.core.PersistentVector.fromArray([webrepl.append_dom.call(null,elem,(
 }
 });
 webrepl.append_dom = (function append_dom(parent,v){
-var G__3118_3119 = cljs.core.seq.call(null,webrepl.dom.call(null,v));
+var G__3149_3150 = cljs.core.seq.call(null,webrepl.dom.call(null,v));
 while(true){
-if(G__3118_3119)
-{var i_3120 = cljs.core.first.call(null,G__3118_3119);
-parent.appendChild(i_3120);
+if(G__3149_3150)
+{var i_3151 = cljs.core.first.call(null,G__3149_3150);
+parent.appendChild(i_3151);
 {
-var G__3121 = cljs.core.next.call(null,G__3118_3119);
-G__3118_3119 = G__3121;
+var G__3152 = cljs.core.next.call(null,G__3149_3150);
+G__3149_3150 = G__3152;
 continue;
 }
 } else
@@ -69,14 +69,14 @@ break;
 return parent;
 });
 webrepl.repl_print = (function repl_print(log,text,cls){
-var G__3123_3124 = cljs.core.seq.call(null,[cljs.core.str(text)].join('').split(/\n/));
+var G__3154_3155 = cljs.core.seq.call(null,[cljs.core.str(text)].join('').split(/\n/));
 while(true){
-if(G__3123_3124)
-{var line_3125 = cljs.core.first.call(null,G__3123_3124);
-webrepl.append_dom.call(null,log,cljs.core.PersistentVector.fromArray(["\uFDD0'div",cljs.core.ObjMap.fromObject(["\uFDD0'class"],{"\uFDD0'class":[cljs.core.str("cg "),cljs.core.str((cljs.core.truth_(cls)?[cljs.core.str(" "),cljs.core.str(cls)].join(''):null))].join('')}),line_3125], true));
+if(G__3154_3155)
+{var line_3156 = cljs.core.first.call(null,G__3154_3155);
+webrepl.append_dom.call(null,log,cljs.core.PersistentVector.fromArray(["\uFDD0'div",cljs.core.ObjMap.fromObject(["\uFDD0'class"],{"\uFDD0'class":[cljs.core.str("cg "),cljs.core.str((cljs.core.truth_(cls)?[cljs.core.str(" "),cljs.core.str(cls)].join(''):null))].join('')}),line_3156], true));
 {
-var G__3126 = cljs.core.next.call(null,G__3123_3124);
-G__3123_3124 = G__3126;
+var G__3157 = cljs.core.next.call(null,G__3154_3155);
+G__3154_3155 = G__3157;
 continue;
 }
 } else
@@ -86,10 +86,10 @@ break;
 return log.scrollTop = log.scrollHeight;
 });
 webrepl.read_next_form = (function read_next_form(text){
-var _STAR_ns_sym_STAR_3129 = cljs.core._STAR_ns_sym_STAR_;
+var _STAR_ns_sym_STAR_3160 = cljs.core._STAR_ns_sym_STAR_;
 try{cljs.core._STAR_ns_sym_STAR_ = cljs.analyzer._STAR_cljs_ns_STAR_;
 return cljs.reader.read_string.call(null,text);
-}finally {cljs.core._STAR_ns_sym_STAR_ = _STAR_ns_sym_STAR_3129;
+}finally {cljs.core._STAR_ns_sym_STAR_ = _STAR_ns_sym_STAR_3160;
 }});
 webrepl.postexpr = (function postexpr(log,text){
 return webrepl.append_dom.call(null,log,cljs.core.PersistentVector.fromArray(["\uFDD0'table",cljs.core.PersistentVector.fromArray(["\uFDD0'tbody",cljs.core.PersistentVector.fromArray(["\uFDD0'tr",cljs.core.PersistentVector.fromArray(["\uFDD0'td",cljs.core.ObjMap.fromObject(["\uFDD0'class"],{"\uFDD0'class":"cg"}),webrepl.prompt.call(null)], true),cljs.core.PersistentVector.fromArray(["\uFDD0'td",text.replace(/\n$/,"")], true)], true)], true)], true));
@@ -97,19 +97,19 @@ return webrepl.append_dom.call(null,log,cljs.core.PersistentVector.fromArray(["\
 webrepl.ep = (function ep(log,text){
 try{var env = cljs.core.assoc.call(null,cljs.analyzer.empty_env.call(null),"\uFDD0'context","\uFDD0'expr");
 var form = webrepl.read_next_form.call(null,text);
-var res = cljs.compiler.emit_str.call(null,cljs.analyzer.analyze.call(null,env,form));
-if(cljs.core.truth_(webrepl._STAR_debug_STAR_))
-{cljs.core.println.call(null,"emit:",res);
-} else
-{}
+var _ = (cljs.core.truth_(webrepl._STAR_debug_STAR_)?cljs.core.println.call(null,"READ:",cljs.core.pr_str.call(null,form)):null);
+var body = cljs.analyzer.analyze.call(null,env,form);
+var ___$1 = (cljs.core.truth_(webrepl._STAR_debug_STAR_)?cljs.core.println.call(null,"ANALYZED:",cljs.core.pr_str.call(null,(new cljs.core.Keyword("\uFDD0'form")).call(null,body))):null);
+var res = cljs.compiler.emit_str.call(null,body);
+var ___$2 = (cljs.core.truth_(webrepl._STAR_debug_STAR_)?cljs.core.println.call(null,"EMITTED:",cljs.core.pr_str.call(null,res)):null);
 return webrepl.repl_print.call(null,log,cljs.core.pr_str.call(null,eval(res)),"rtn");
-}catch (e3132){if(cljs.core.instance_QMARK_.call(null,Error,e3132))
-{var e = e3132;
+}catch (e3163){if(cljs.core.instance_QMARK_.call(null,Error,e3163))
+{var e = e3163;
 webrepl.repl_print.call(null,log,e.stack,"err");
 return webrepl._STAR_e = e;
 } else
 {if("\uFDD0'else")
-{throw e3132;
+{throw e3163;
 } else
 {return null;
 }
@@ -122,15 +122,16 @@ return webrepl.ep.call(null,log,text);
 window.onload = (function (){
 var log = document.getElementById("log");
 var input = document.getElementById("input");
-var status = document.getElementById("status");
-cljs.core._STAR_print_fn_STAR_ = (function (p1__3133_SHARP_){
-return webrepl.repl_print.call(null,log,p1__3133_SHARP_,null);
+var status1 = document.getElementById("status1");
+var status2 = document.getElementById("status2");
+cljs.core._STAR_print_fn_STAR_ = (function (p1__3164_SHARP_){
+return webrepl.repl_print.call(null,log,p1__3164_SHARP_,null);
 });
 cljs.core.println.call(null,";; ClojureScript");
 webrepl.append_dom.call(null,log,cljs.core.PersistentVector.fromArray(["\uFDD0'div",cljs.core.ObjMap.fromObject(["\uFDD0'class"],{"\uFDD0'class":"cg"}),";;   - ",cljs.core.PersistentVector.fromArray(["\uFDD0'a",cljs.core.ObjMap.fromObject(["\uFDD0'href"],{"\uFDD0'href":"http://github.com/kanaka/clojurescript"}),"http://github.com/kanaka/clojurescript"], true)], true));
 cljs.core.println.call(null,";;   - A port of the ClojureScript compiler to ClojureScript");
 webrepl.pep.call(null,log,"(+ 1 2)");
-webrepl.pep.call(null,log,"(def sqr (fn* [x] (* x x)))");
+webrepl.pep.call(null,log,"(defn sqr [x] (* x x))");
 webrepl.pep.call(null,log,"(sqr 8)");
 webrepl.pep.call(null,log,"(defmacro unless [pred a b] `(if (not ~pred) ~a ~b))");
 webrepl.pep.call(null,log,"(unless false :yep :nope)");
@@ -147,18 +148,20 @@ webrepl.pep.call(null,log,input.value);
 setTimeout((function (){
 return input.value = "";
 }),0);
-status.src = "blank.gif";
+status1.style.visibility = "visible";
+status2.style.visibility = "hidden";
 return document.getElementById("ns").innerText = webrepl.prompt.call(null);
-}catch (e3134){if(cljs.core.instance_QMARK_.call(null,Error,e3134))
-{var e = e3134;
-if(cljs.core._EQ_.call(null,e.message,"EOF while reading"))
-{return status.src = "dots.png";
+}catch (e3165){if(cljs.core.instance_QMARK_.call(null,Error,e3165))
+{var e = e3165;
+if(cljs.core.truth_(cljs.core.re_find.call(null,/EOF while reading/,e.message)))
+{status1.style.visibility = "hidden";
+return status2.style.visibility = "visible";
 } else
 {return webrepl.repl_print.call(null,log,e,"err");
 }
 } else
 {if("\uFDD0'else")
-{throw e3134;
+{throw e3165;
 } else
 {return null;
 }
