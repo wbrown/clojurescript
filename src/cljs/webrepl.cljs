@@ -58,8 +58,12 @@
           body (ana/analyze env form)
           _ (when *debug* (println "ANALYZED:" (pr-str (:form body))))
           res (comp/emit-str body)
-          _ (when *debug* (println "EMITTED:" (pr-str res)))]
-      (repl-print log (pr-str (js/eval res)) "rtn"))
+          _ (when *debug* (println "EMITTED:" (pr-str res)))
+          value (js/eval res)]
+      (set! *3 *2)
+      (set! *2 *1)
+      (set! *1 value)
+      (repl-print log (pr-str value) "rtn"))
     (catch js/Error e
       (repl-print log (.-stack e) "err")
       (set! *e e))))
@@ -69,6 +73,11 @@
  (ep log text))
 
 (set! (.-onload js/window) (fn []
+  ;; Bootstrap an empty version of the cljs.user namespace
+  (swap! cljs.compiler/*emitted-provides* conj (symbol "cljs.user"))
+  (.provide js/goog "cljs.user")
+  (set! cljs.core/*ns-sym* (symbol "cljs.user"))
+
   (let [log (.getElementById js/document "log")
         input (.getElementById js/document "input")
         status1 (.getElementById js/document "status1")
