@@ -102,7 +102,11 @@ var body = cljs.analyzer.analyze.call(null,env,form);
 var ___$1 = (cljs.core.truth_(webrepl._STAR_debug_STAR_)?cljs.core.println.call(null,"ANALYZED:",cljs.core.pr_str.call(null,(new cljs.core.Keyword("\uFDD0'form")).call(null,body))):null);
 var res = cljs.compiler.emit_str.call(null,body);
 var ___$2 = (cljs.core.truth_(webrepl._STAR_debug_STAR_)?cljs.core.println.call(null,"EMITTED:",cljs.core.pr_str.call(null,res)):null);
-return webrepl.repl_print.call(null,log,cljs.core.pr_str.call(null,eval(res)),"rtn");
+var value = eval(res);
+cljs.core._STAR_3 = cljs.core._STAR_2;
+cljs.core._STAR_2 = cljs.core._STAR_1;
+cljs.core._STAR_1 = value;
+return webrepl.repl_print.call(null,log,cljs.core.pr_str.call(null,value),"rtn");
 }catch (e3163){if(cljs.core.instance_QMARK_.call(null,Error,e3163))
 {var e = e3163;
 webrepl.repl_print.call(null,log,e.stack,"err");
@@ -120,6 +124,9 @@ webrepl.postexpr.call(null,log,text);
 return webrepl.ep.call(null,log,text);
 });
 window.onload = (function (){
+cljs.core.swap_BANG_.call(null,cljs.compiler._STAR_emitted_provides_STAR_,cljs.core.conj,cljs.core.symbol.call(null,"cljs.user"));
+goog.provide("cljs.user");
+cljs.core._STAR_ns_sym_STAR_ = cljs.core.symbol.call(null,"cljs.user");
 var log = document.getElementById("log");
 var input = document.getElementById("input");
 var status1 = document.getElementById("status1");
