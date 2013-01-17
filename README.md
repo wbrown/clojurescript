@@ -36,11 +36,9 @@ goal of being fully self-hosting (i.e. ClojureScript-in-ClojureScript).
 
 ### Bugs
 
-- division symbol breaks namespaces atom (currently removed)
-- regexes with forward slashes are printed with extra escaping
 - numeric keywords (:2) are broken
 - anonymous functions do not warn about arity
-- non-unicode symbol breakage
+- Unicode symbol breakage
 - hex numbers "0x7e7"
 - warnings during compile about *unchecked-if*
 
@@ -56,6 +54,7 @@ goal of being fully self-hosting (i.e. ClojureScript-in-ClojureScript).
 - get test/cljs/cljs/core_test.cljs to load/run successfully
 - line numbered errors
 - single file output and performance optimizations (without unused code removal)
+- better long line/multiline editing in web REPL
 
 ### Build
 
