@@ -45,6 +45,8 @@
   (assert (= '(3 6 9 12) (seq (let [a (array 1 2 3 4)] (amap a i ret (* 3 (aget a i)))))))
   (assert (= 25 (let [a (array 1 2 3 4 5)] (areduce a i ret 10 (+ ret (aget a i))))))
 
+  ;; unicode
+  (assert (= "ü" "\u00fc") "unicodes are read properly")
 
   ;; Macros
   (assert (= 5 (quick-mac 5)))
