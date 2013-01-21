@@ -116,7 +116,8 @@
       9 "\\t"
       (if (< 31 cp 127)
         c ; Print simple ASCII characters
-        (format "\\u%04X" cp))))) ; Any other character is Unicode
+        ; Any other character is Unicode
+        (apply str "\\u" (take-last 4 (str "0000" (.toString cp 16))))))))
 
 (defn- escape-pattern [^String pattern]
   (-> pattern
