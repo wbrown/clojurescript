@@ -60,8 +60,11 @@
            (not (re-find #"EOF while reading" (.-message e))))))
 
 (defn start-prompt []
-  (let [prompt-label (prompt)]
-    (.SetPromptLabel js/jqconsole (str "\n" prompt-label))
+  (let [prompt-label (str "\n" (prompt))
+        continue-label (str "\n"
+                            (apply str (repeat (- (count prompt-label) 5) " "))
+                            "... ")]
+    (.SetPromptLabel js/jqconsole prompt-label continue-label)
     (.Prompt js/jqconsole "true"
              (fn [input]
                (let [msg (handle-input input)]
@@ -69,7 +72,7 @@
                  (start-prompt)))
              #(if (complete-form? %)
                 false
-                (int (- (count prompt-label) 4))))))
+                0))))
 
 (.ready (js/jQuery js/document)
   (fn []
@@ -81,7 +84,9 @@
     ;; setup the REPL console
     (set! js/jqconsole
           (.jqconsole (js/jQuery "#console")
-                      "ClojureScript-in-ClojureScript Web REPL" "\n>>> "))
+                      "ClojureScript-in-ClojureScript Web REPL"
+                      "\n>>> "
+                      ""))
     (.SetIndentWidth js/jqconsole 1)
     (set! *print-fn* #(.Write js/jqconsole %))
     (start-prompt)
