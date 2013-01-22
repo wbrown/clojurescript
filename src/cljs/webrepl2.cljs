@@ -60,15 +60,16 @@
            (not (re-find #"EOF while reading" (.-message e))))))
 
 (defn start-prompt []
-  (.SetPromptLabel js/jqconsole (str "\n" (prompt)))
-  (.Prompt js/jqconsole "true"
-           (fn [input]
-             (let [msg (handle-input input)]
-               (.Write js/jqconsole (:msg msg) (:className msg))
-               (start-prompt)))
-           #(if (complete-form? %)
-              false
-              0)))
+  (let [prompt-label (prompt)]
+    (.SetPromptLabel js/jqconsole (str "\n" prompt-label))
+    (.Prompt js/jqconsole "true"
+             (fn [input]
+               (let [msg (handle-input input)]
+                 (.Write js/jqconsole (:msg msg) (:className msg))
+                 (start-prompt)))
+             #(if (complete-form? %)
+                false
+                (int (- (count prompt-label) 4))))))
 
 (.ready (js/jQuery js/document)
   (fn []
@@ -81,6 +82,7 @@
     (set! js/jqconsole
           (.jqconsole (js/jQuery "#console")
                       "ClojureScript-in-ClojureScript Web REPL" "\n>>> "))
+    (.SetIndentWidth js/jqconsole 1)
     (set! *print-fn* #(.Write js/jqconsole %))
     (start-prompt)
 
