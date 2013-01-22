@@ -1,7 +1,5 @@
 (ns webrepl
-  (:require [cljs.core]
-            [clojure.string :as str]
-            [cljs.analyzer :as ana]
+  (:require [cljs.analyzer :as ana]
             [cljs.compiler :as comp]
             [cljs.reader :as reader]))
 
