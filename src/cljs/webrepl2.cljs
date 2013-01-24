@@ -6,12 +6,6 @@
 (def ^:dynamic *debug* false)
 (def ^:dynamic *e nil)
 
-(defn- map->js [m]
-  (let [out (js-obj)]
-    (doseq [[k v] m]
-      (aset out (name k) v))
-    out))
-
 (defn prompt [] (str ana/*cljs-ns* "=> "))
 
 (defn- read-next-form [text]
