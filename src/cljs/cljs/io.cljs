@@ -137,10 +137,20 @@
   (getPath [_]
     (path-normalize pathname))
 
+  ;; Tests whether the file denoted by this abstract pathname is
+  ;; a directory
+  (isDirectory [me]
+    (file-is-dir? (.getPath me)))
+
   ;; Returns the time that the file denoted by this abstract pathname
   ;; was last modified
   (lastModified [_]
     (.getTime (.-mtime (file-stat pathname))))
+
+  ;; Returns an array of abstract pathnames denoting the files in the
+  ;; directory denoted by this abstract pathname
+  (listFiles [me]
+    (file-readdir (.getPath me)))
 
   ;; Creates the directory named by this abstract pathname, including
   ;; any necessary but nonexistent parent directories
@@ -165,9 +175,9 @@
   [^cljs.io.File dir]
   (tree-seq
    (fn [^cljs.io.File f]
-     (file-is-dir? (.getPath f)))
+     (.isDirectory f))
    (fn [^cljs.io.File d]
-     (map #(cljs.io.File. (str d path-separator %)) (file-readdir (.getPath d))))
+     (map #(cljs.io.File. (str d path-separator %)) (.listFiles d)))
    dir))
 
 
