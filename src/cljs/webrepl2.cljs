@@ -8,10 +8,10 @@
 (def ^:dynamic *debug* false)
 (def ^:dynamic *e nil)
 
-(defn prompt [] (str ana/*cljs-ns* "=> "))
+(defn prompt [] (str ana/*ns-sym* "=> "))
 
 (defn- read-next-form [text]
-  (binding [*ns-sym* ana/*cljs-ns*]
+  (binding [*ns-sym* *ns-sym*]
     (reader/read-string text)))
 
 (defn ep [text]

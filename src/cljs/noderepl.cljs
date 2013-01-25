@@ -7,7 +7,7 @@
 (def ^:dynamic *debug* false)
 (def ^:dynamic *e nil)
 
-(defn prompt [] (str ana/*cljs-ns* "=> "))
+(defn prompt [] (str *ns-sym* "=> "))
 
 (defn repl-print [text cls]
   (doseq [line (.split (str text) #"\n")]
@@ -16,7 +16,7 @@
     (println line)))
 
 (defn- read-next-form [text]
-  (binding [*ns-sym* ana/*cljs-ns*]
+  (binding [*ns-sym* *ns-sym*]
     (reader/read-string text)))
 
 (defn postexpr [text]
