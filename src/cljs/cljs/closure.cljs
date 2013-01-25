@@ -35,28 +35,25 @@
   "
   (:require [cljs.compiler :as comp]
             [cljs.analyzer :as ana]
-            [clojure.java.io :as io]
+            [cljs.reader :as reader]
+            [cljs.io :as io]
             [clojure.string :as string])
-  (:import java.io.File
-           java.io.BufferedInputStream
-           java.net.URL
-           java.util.logging.Level
-           java.util.jar.JarFile
-           com.google.common.collect.ImmutableList
-           com.google.javascript.jscomp.CompilerOptions
-           com.google.javascript.jscomp.CompilationLevel
-           com.google.javascript.jscomp.SourceMap$Format
-           com.google.javascript.jscomp.SourceMap$DetailLevel
-           com.google.javascript.jscomp.ClosureCodingConvention
-           com.google.javascript.jscomp.JSSourceFile
-           com.google.javascript.jscomp.Result
-           com.google.javascript.jscomp.JSError
-           com.google.javascript.jscomp.CommandLineRunner))
+  (:use-macros [cljs.compiler-macros :only [with-core-cljs]]))
 
-(def name-chars (map char (concat (range 48 57) (range 65 90) (range 97 122))))
+(def name-chars (map #(.fromCharCode js/String %) (concat (range 48 57) (range 65 90) (range 97 122))))
 
 (defn random-char []
   (nth name-chars (.nextInt (java.util.Random.) (count name-chars))))
+
+(defn random-int
+  ([end]
+    (random-int 0 end))
+  ([start end]
+    (let [max (- end start)]
+      (+ start (int (mod (* max (.random js/Math)) max))))))
+
+(defn random-char []
+  (nth name-chars (random-int (count name-chars))))
 
 (defn random-string [length]
   (apply str (take length (repeatedly random-char))))
@@ -75,53 +72,53 @@
 (defmethod js-source-file BufferedInputStream [^String name ^BufferedInputStream source]
   (JSSourceFile/fromInputStream name source))
 
-(defn set-options
-  "TODO: Add any other options that we would like to support."
-  [opts ^CompilerOptions compiler-options]
-  (when (contains? opts :pretty-print)
-    (set! (.prettyPrint compiler-options) (:pretty-print opts)))
-  (when (contains? opts :print-input-delimiter)
-    (set! (.printInputDelimiter compiler-options)
-      (:print-input-delimiter opts))))
+;; (defn set-options
+;;   "TODO: Add any other options that we would like to support."
+;;   [opts ^CompilerOptions compiler-options]
+;;   (when (contains? opts :pretty-print)
+;;     (set! (.prettyPrint compiler-options) (:pretty-print opts)))
+;;   (when (contains? opts :print-input-delimiter)
+;;     (set! (.printInputDelimiter compiler-options)
+;;       (:print-input-delimiter opts))))
+;; 
+;; (defn make-options
+;;   "Create a CompilerOptions object and set options from opts map."
+;;   [opts]
+;;   (let [level (case (:optimizations opts)
+;;                 :advanced CompilationLevel/ADVANCED_OPTIMIZATIONS
+;;                 :whitespace CompilationLevel/WHITESPACE_ONLY
+;;                 :simple CompilationLevel/SIMPLE_OPTIMIZATIONS)
+;;         compiler-options (doto (CompilerOptions.)
+;;                            (.setCodingConvention (ClosureCodingConvention.)))]
+;;     (when (contains? opts :source-map)
+;;       (set! (.sourceMapOutputPath compiler-options)
+;;             (:source-map opts))
+;;       (set! (.sourceMapDetailLevel compiler-options)
+;;             SourceMap$DetailLevel/ALL)
+;;       (set! (.sourceMapFormat compiler-options)
+;;             SourceMap$Format/V3))
+;;     (do (.setOptionsForCompilationLevel level compiler-options)
+;;         (set-options opts compiler-options)
+;;         compiler-options)))
 
-(defn make-options
-  "Create a CompilerOptions object and set options from opts map."
-  [opts]
-  (let [level (case (:optimizations opts)
-                :advanced CompilationLevel/ADVANCED_OPTIMIZATIONS
-                :whitespace CompilationLevel/WHITESPACE_ONLY
-                :simple CompilationLevel/SIMPLE_OPTIMIZATIONS)
-        compiler-options (doto (CompilerOptions.)
-                           (.setCodingConvention (ClosureCodingConvention.)))]
-    (when (contains? opts :source-map)
-      (set! (.sourceMapOutputPath compiler-options)
-            (:source-map opts))
-      (set! (.sourceMapDetailLevel compiler-options)
-            SourceMap$DetailLevel/ALL)
-      (set! (.sourceMapFormat compiler-options)
-            SourceMap$Format/V3))
-    (do (.setOptionsForCompilationLevel level compiler-options)
-        (set-options opts compiler-options)
-        compiler-options)))
 
 
-
-(defn jar-entry-names* [jar-path]
-  (with-open [z (java.util.zip.ZipFile. jar-path)]
-    (doall (map #(.getName %) (enumeration-seq (.entries z))))))
-
-(def jar-entry-names (memoize jar-entry-names*))
-
-(defn find-js-jar
-  "finds js resources from a given path in a jar file"
-  [jar-path lib-path]
-  (doall
-    (map #(io/resource %)
-         (filter #(do
-                    (and 
-                      (.startsWith % lib-path)
-                      (.endsWith % ".js")))
-                 (jar-entry-names jar-path)))))
+;; (defn jar-entry-names* [jar-path]
+;;   (with-open [z (java.util.zip.ZipFile. jar-path)]
+;;     (doall (map #(.getName %) (enumeration-seq (.entries z))))))
+;; 
+;; (def jar-entry-names (memoize jar-entry-names*))
+;; 
+;; (defn find-js-jar
+;;   "finds js resources from a given path in a jar file"
+;;   [jar-path lib-path]
+;;   (doall
+;;     (map #(io/resource %)
+;;          (filter #(do
+;;                     (and 
+;;                       (.startsWith % lib-path)
+;;                       (.endsWith % ".js")))
+;;                  (jar-entry-names jar-path)))))
 (declare to-url)
 (defn find-js-fs
   "finds js resources from a path on the files system"
@@ -215,11 +212,13 @@
 ;; Protocols for IJavaScript and Compilable
 ;; ========================================
 
-(defmulti to-url class)
+(defmulti to-url type)
 
-(defmethod to-url File [^File f] (.toURL (.toURI f)))
+;; TODO: deal with URL/URIs
+;;(defmethod to-url File [^File f] (.toURL (.toURI f)))
+(defmethod to-url cljs.io.File [^cljs.io.File f] (.getPath f))
 
-(defmethod to-url String [s] (to-url (io/file s)))
+(defmethod to-url string [s] (to-url (io/file s)))
 
 (defprotocol IJavaScript
   (-foreign? [this] "Whether the Javascript represents a foreign
@@ -232,14 +231,14 @@
 
 (extend-protocol IJavaScript
   
-  String
+  string
   (-foreign? [this] false)
   (-url [this] nil)
   (-provides [this] (:provides (parse-js-ns (string/split-lines this))))
   (-requires [this] (:requires (parse-js-ns (string/split-lines this))))
   (-source [this] this)
   
-  clojure.lang.IPersistentMap
+  cljs.core.PersistentHashMap
   (-foreign? [this] (:foreign this))
   (-url [this] (or (:url this)
                    (to-url (:file this))))
@@ -247,7 +246,17 @@
   (-requires [this] (map name (:requires this)))
   (-source [this] (if-let [s (:source this)]
                     s
-                    (slurp (io/reader (-url this))))))
+                    (io/file-read (io/resource (-url this)))))
+
+  cljs.core.ObjMap
+  (-foreign? [this] (:foreign this))
+  (-url [this] (or (:url this)
+                   (to-url (:file this))))
+  (-provides [this] (map name (:provides this)))
+  (-requires [this] (map name (:requires this)))
+  (-source [this] (if-let [s (:source this)]
+                    s
+                    (io/file-read (io/resource (-url this))))))
 
 (defrecord JavaScriptFile [foreign ^URL url provides requires]
   IJavaScript
@@ -255,7 +264,7 @@
   (-url [this] url)
   (-provides [this] provides)
   (-requires [this] requires)
-  (-source [this] (slurp (io/reader url))))
+  (-source [this] (io/file-read (io/resource url))))
 
 (defn javascript-file [foreign ^URL url provides requires]
   (JavaScriptFile. foreign url (map name provides) (map name requires)))
@@ -269,7 +278,7 @@
 (defn read-js
   "Read a JavaScript file returning a map of file information."
   [f]
-  (let [source (slurp f)
+  (let [source (io/file-read f)
         m (parse-js-ns (string/split-lines source))]
     (map->javascript-file (assoc m :file f))))
 
@@ -327,14 +336,14 @@
 (defn compile-form-seq
   "Compile a sequence of forms to a JavaScript source string."
   [forms]
-  (comp/with-core-cljs
+  (with-core-cljs
     (with-out-str
       (binding [ana/*cljs-ns* 'cljs.user]
         (doseq [form forms]
           (comp/emit (ana/analyze (ana/empty-env) form)))))))
 
 (defn output-directory [opts]
-  (or (:output-dir opts) "out"))
+  (or (:output-dir opts) "out2"))
 
 (def compiled-cljs (atom {}))
 
@@ -385,7 +394,7 @@
   (let [out-file (io/file out-dir (path-from-jarfile url)) 
         content (slurp (io/reader url))]
     (do (comp/mkdirs out-file)
-        (spit out-file content)
+        (io/file-write out-file content)
         out-file)))
 
 (defn compile-from-jar
@@ -400,26 +409,30 @@
 
 (extend-protocol Compilable
 
-  File
+  cljs.io.File
   (-compile [this opts]
     (if (.isDirectory this)
       (compile-dir this opts)
       (compile-file this opts)))
 
-  URL
-  (-compile [this opts]
-    (case (.getProtocol this)
-      "file" (-compile (io/file this) opts)
-      "jar" (compile-from-jar this opts)))
+;;   URL
+;;   (-compile [this opts]
+;;     (case (.getProtocol this)
+;;       "file" (-compile (io/file this) opts)
+;;       "jar" (compile-from-jar this opts)))
   
-  clojure.lang.PersistentList
+  cljs.core.EmptyList
   (-compile [this opts]
     (compile-form-seq [this]))
   
-  String
+  cljs.core.List
+  (-compile [this opts]
+    (compile-form-seq [this]))
+  
+  string
   (-compile [this opts] (-compile (io/file this) opts))
   
-  clojure.lang.PersistentVector
+  cljs.core.PersistentVector
   (-compile [this opts] (compile-form-seq this))
   )
 
@@ -512,11 +525,11 @@
   (letfn [(parse-list [s] (when (> (count s) 0)
                             (-> (.substring s 1 (dec (count s)))
                                 (string/split #"'\s*,\s*'"))))]
-    (->> (line-seq (io/reader (io/resource "goog/deps.js")))
+    (->> (reader/line-seq (reader/push-back-reader (io/file-read (io/resource "goog/deps.js"))))
          (map #(re-matches #"^goog\.addDependency\(['\"](.*)['\"],\s*\[(.*)\],\s*\[(.*)\]\);.*" %))
          (remove nil?)
          (map #(drop 1 %))
-         (remove #(.startsWith (first %) "../../third_party"))
+         (remove #(re-find #"^../../third_party" (first %)))
          (map #(hash-map :file (str "goog/"(first %))
                          :provides (parse-list (second %))
                          :requires (parse-list (last %))
@@ -576,7 +589,7 @@
   Only load dependencies from the classpath."
   [opts requires]
   (let [index (js-dependency-index opts)]
-    (letfn [(ns->cp [s] (str (string/replace (munge s) \. \/) ".cljs"))
+    (letfn [(ns->cp [s] (str (string/replace (comp/munge s) \. \/) ".cljs"))
             (cljs-deps [coll]
               (->> coll
                    (remove #(contains? index %))
@@ -653,7 +666,7 @@
 (defmethod javascript-name URL [^URL url]
   (if url (.getPath url) "cljs/user.js"))
 
-(defmethod javascript-name String [s]
+(defmethod javascript-name string [s]
   (if-let [name (first (-provides s))] name "cljs/user.js"))
 
 (defmethod javascript-name JavaScriptFile [js] (javascript-name (-url js)))
@@ -668,15 +681,15 @@
            (when-let [url (-url js)]
              (js-source-file (javascript-name url)
                              (if (-foreign? js)
-                               (str (build-provides (-provides js)) (slurp url))
-                               (io/input-stream url)))))
+                               (str (build-provides (-provides js)) (io/file-read url))
+                               (io/file-read url)))))
 
 (defn optimize
   "Use the Closure Compiler to optimize one or more JavaScript files."
   [opts & sources]
   (let [closure-compiler (make-closure-compiler)
         externs (load-externs opts)
-        compiler-options (make-options opts)
+;;         compiler-options (make-options opts)
         sources (if (= :whitespace (:optimizations opts))
                   (cons "var CLOSURE_NO_DEPS = true;" sources)
                   sources)
@@ -756,7 +769,7 @@
 (defn add-dep-string
   "Return a goog.addDependency string for an input."
   [opts input]
-  (letfn [(ns-list [coll] (when (seq coll) (apply str (interpose ", " (map #(str "'" (munge %) "'") coll)))))]
+  (letfn [(ns-list [coll] (when (seq coll) (apply str (interpose ", " (map #(str "'" (comp/munge %) "'") coll)))))]
     (str "goog.addDependency(\""
          (path-relative-to (io/file (output-directory opts) "goog/base.js") input)
          "\", ["
@@ -778,7 +791,7 @@
 
 (defn output-one-file [{:keys [output-to]} js]
   (cond (nil? output-to) js
-        (string? output-to) (spit output-to js)
+        (string? output-to) (io/file-write output-to js)
         :else (println js)))
 
 (defn output-deps-file [opts sources]
@@ -803,7 +816,7 @@
         out-file (io/file out-dir out-name)]
     (do (when-not (.exists out-file)
           (do (comp/mkdirs out-file)
-              (spit out-file (-source js))))
+              (io/file-write out-file (-source js))))
         {:url (to-url out-file) :requires (-requires js) :provides (-provides js) :group (:group js)})))
 
 (defn source-on-disk
@@ -812,7 +825,8 @@
   updated IJavaScript with the new location."
   [opts js]
   (let [url ^URL (-url js)]
-    (if (or (not url) (= (.getProtocol url) "jar"))
+    ; if (or (not url) (= (.getProtocol url) "jar"))
+    (if (not url)
       (write-javascript opts js)
       js)))
 
@@ -837,7 +851,7 @@
   (let [disk-sources (map #(source-on-disk opts %) sources)]
     (let [goog-deps (io/file (output-directory opts) "goog/deps.js")]
       (do (comp/mkdirs goog-deps)
-          (spit goog-deps (deps-file opts (filter #(= (:group %) :goog) disk-sources)))
+          (io/file-write goog-deps (deps-file opts (filter #(= (:group %) :goog) disk-sources)))
           (output-deps-file opts (remove #(= (:group %) :goog) disk-sources))))))
 
 (comment
@@ -858,16 +872,16 @@
   )
 
 
-(defn get-upstream-deps* 
-  "returns a merged map containing all upstream dependencies defined by libraries on the classpath"
-  []
-  (let [classloader (. (Thread/currentThread) (getContextClassLoader))
-        upstream-deps (map #(read-string (slurp %)) (enumeration-seq (. classloader (findResources "deps.cljs"))))]
-    (doseq [dep upstream-deps]
-      (println (str "Upstream deps.cljs found on classpath. " dep " This is an EXPERIMENTAL FEATURE and is not guarenteed to remain stable in future versions.")))
-    (apply merge-with concat upstream-deps)))
-
-(def get-upstream-deps (memoize get-upstream-deps*))
+;; (defn get-upstream-deps* 
+;;   "returns a merged map containing all upstream dependencies defined by libraries on the classpath"
+;;   []
+;;   (let [classloader (. (Thread/currentThread) (getContextClassLoader))
+;;         upstream-deps (map #(read-string (slurp %)) (enumeration-seq (. classloader (findResources "deps.cljs"))))]
+;;     (doseq [dep upstream-deps]
+;;       (println (str "Upstream deps.cljs found on classpath. " dep " This is an EXPERIMENTAL FEATURE and is not guarenteed to remain stable in future versions.")))
+;;     (apply merge-with concat upstream-deps)))
+;; 
+;; (def get-upstream-deps (memoize get-upstream-deps*))
 
 (defn add-header [{:keys [hashbang target]} js]
   (if (= :nodejs target)
@@ -882,11 +896,13 @@
 (defn build
   "Given a source which can be compiled, produce runnable JavaScript."
   [source opts]
-  (ana/reset-namespaces!)
+;; TODO: what to do here?
+;;  (ana/reset-namespaces!)
   (let [opts (if (= :nodejs (:target opts))
                (merge {:optimizations :simple} opts)
                opts)
-        ups-deps (get-upstream-deps)
+;;         ups-deps (get-upstream-deps)
+        ups-deps nil
         all-opts (assoc opts 
                    :ups-libs (:libs ups-deps)
                    :ups-foreign-libs (:foreign-libs ups-deps)
@@ -902,7 +918,8 @@
                          (apply add-dependencies all-opts
                             (concat (if (coll? compiled) compiled [compiled])
                                     #_(when (= :nodejs (:target all-opts))
-                                      [(-compile (io/resource "cljs/nodejs.cljs") all-opts)])))
+                                      [(-compile (io/resource "cljs/nodejs.cljs") all-opts)])
+                                      ))
                          #_(when (= :nodejs (:target all-opts))
                            [(-compile (io/resource "cljs/nodejscli.cljs") all-opts)]))
             optim (:optimizations all-opts)]

@@ -181,3 +181,14 @@
    dir))
 
 
+;; TODO: this should search the "classpath" to find the object
+(defn resource [path]    
+  (let [p1 (str "out2/" path)
+        p2 (str "../src/cljs/" path)
+        p3 (str "../closure/library/closure/" path)]
+    (cond
+      (file-exists? p1) p1
+      (file-exists? p2) p2
+      (file-exists? p3) p3
+      :else nil
+      )))

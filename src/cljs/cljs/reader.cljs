@@ -89,6 +89,26 @@ nil if the end of stream has been reached")
       (do (unread rdr ch) (. sb (toString)))
       (recur (do (.append sb ch) sb) (read-char rdr)))))
 
+(defn read-line
+  "Reads to the end of a line and returns the line."
+  [rdr]
+  (loop [sb (gstring/StringBuffer.)
+         ch (read-char rdr)]
+    (cond
+      (and (nil? ch) (= 0 (.getLength sb)))
+      nil
+
+      (or (identical? ch "\n") (identical? ch "\r") (nil? ch))
+      (. sb (toString))
+
+      :else
+      (recur (do (.append sb ch) sb) (read-char rdr)))))
+
+(defn line-seq [rdr]
+  "Returns the lines of text from rdr as a lazy sequence of strings."
+  (when-let [line (read-line rdr)]
+    (cons line (lazy-seq (line-seq rdr)))))
+
 (defn skip-line
   "Advances the reader to the end of a line. Returns the reader"
   [reader _]
