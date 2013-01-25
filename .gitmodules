@@ -1,0 +1,3 @@
+[submodule "web/vendor/jq-console"]
+	path = web/vendor/jq-console
+	url = https://github.com/replit/jq-console
