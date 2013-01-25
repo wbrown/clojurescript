@@ -15,6 +15,16 @@
   (assert (= ':bar/foo (keyword "bar" "foo")))
   (assert (= *ns-sym* (symbol (namespace ::foo))))
 
+  (assert (= (namespace :foo) nil) "ns isn't nil")
+  (assert (= (name :foo) "foo") "name isn't foo")
+  (assert (= (name ::foo) "foo") "name isn't foo")
+  (assert (= (namespace ::foo) (str *ns-sym*)) "wrong ns")
+
+  (assert (= (namespace :1) nil) "ns isn't nil")
+  (assert (= (name :1) \1) "name isn't 1")
+  (assert (= (namespace ::2) (str *ns-sym*)) "wrong ns")
+  (assert (= (name ::2) \2) "name isn't 2")
+
   ;; symbols
   (assert (= 'mysym (symbol "mysym")))
   (assert (= 'bar/mysym (symbol "bar" "mysym")))
@@ -26,6 +36,9 @@
   (assert (= "cljs.user" (namespace (with-meta 'cljs.user/foo {:a 1}))))
   (assert (= "cljs.user" (namespace (with-meta (with-meta 'cljs.user/foo {:a 1}) {:b 2}))))
 
+  ;; hexs
+  (assert (= 0x7e7 2023) "hexs are read and parsed")
+
   ;; regex
   (assert (= '("/a" "/d" "/g") (re-seq #"/." "/abc/def/ghi")))
   (assert (= 1 (count (take 2 (re-seq #"^$" "")))))
@@ -35,6 +48,8 @@
   (assert (= '(3 6 9 12) (seq (let [a (array 1 2 3 4)] (amap a i ret (* 3 (aget a i)))))))
   (assert (= 25 (let [a (array 1 2 3 4 5)] (areduce a i ret 10 (+ ret (aget a i))))))
 
+  ;; unicode
+  (assert (= "ü" "\u00fc") "unicodes are read properly")
 
   ;; Macros
   (assert (= 5 (quick-mac 5)))

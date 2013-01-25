@@ -7,7 +7,7 @@
 (def ^:dynamic *debug* false)
 (def ^:dynamic *e nil)
 
-(defn prompt [] (str ana/*cljs-ns* "=> "))
+(defn prompt [] (str *ns-sym* "=> "))
 
 (def append-dom)
 
@@ -39,7 +39,7 @@
   (set! (.-scrollTop log) (.-scrollHeight log)))
 
 (defn- read-next-form [text]
-  (binding [*ns-sym* ana/*cljs-ns*]
+  (binding [*ns-sym* *ns-sym*]
     (reader/read-string text)))
 
 (defn postexpr [log text]

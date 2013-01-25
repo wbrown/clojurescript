@@ -116,7 +116,8 @@
       9 "\\t"
       (if (< 31 cp 127)
         c ; Print simple ASCII characters
-        (format "\\u%04X" cp))))) ; Any other character is Unicode
+        ; Any other character is Unicode
+        (apply str "\\u" (take-last 4 (str "0000" (.toString cp 16))))))))
 
 (defn- escape-pattern [^String pattern]
   (-> pattern
@@ -164,9 +165,10 @@
   nil)
 
 (defn emit-provide [sym]
-  (when-not (or (nil? *emitted-provides*) (contains? @*emitted-provides* sym))
-    (swap! *emitted-provides* conj sym)
-    (emitln "goog.provide('" (munge sym) "');")))
+  (when-not (goog.getObjectByName (str sym))
+    (when-not (or (nil? *emitted-provides*) (contains? @*emitted-provides* sym))
+      (swap! *emitted-provides* conj sym)
+      (emitln "goog.provide('" (munge sym) "');"))))
 
 
 (defn- emit-meta-constant [x & body]
@@ -825,7 +827,11 @@
             ast (ana/analyze env (first forms))
             js-str (emit-str ast)
             code (str code js-str)
-            output (str output (with-out-str (js/eval js-str)))]
+            output1 (try
+                      (with-out-str (js/eval js-str))
+                      (catch js/Error e
+                        (throw (js/Error. (str "Failed to evaluate: " (pr-str js-str) "\n" e)))))
+            output (str output output1)]
         ;(print js-str)
         (if (= (:op ast) :ns)
           (recur (rest forms) (:name ast) (merge (:uses ast) (:requires ast)) code output)
@@ -851,10 +857,10 @@
   ;; from read-string when trying to read 'cljs.core//
   (let [nss1 (update-in (dissoc (get @ana/namespaces ns) :requires-macros)
                         [:defs '/] assoc :name 'cljs.core/_SLASH_)
-        nss2 (update-in (read-string (pr-str nss1))
+        nss2 (update-in (reader/read-string (pr-str nss1))
                         [:defs '/] assoc :name (symbol "cljs.core//"))]
     (apply str
-      (emit (ana/analyze (ana/empty-env)
+      (emit-str (ana/analyze (ana/empty-env)
         (list 'swap! 'cljs.core/namespaces 'assoc (list 'quote ns) (list 'quote nss2)))))))
 
 

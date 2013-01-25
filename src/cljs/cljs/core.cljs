@@ -1498,7 +1498,7 @@ reduces them without incurring seq initialization"
   ([name] (cond (keyword? name) name
                 (symbol? name) (str* "\uFDD0" "'" name)
                 :else (str* "\uFDD0" "'" name)))
-  ([ns name] (keyword (str* ns "/" name))))
+  ([ns name] (keyword (if ns (str* ns "/" name) name))))
 
 
 
@@ -7276,25 +7276,6 @@ reduces them without incurring seq initialization"
     (goog.string/hashCode (pr-str this))))
 
 
-;;;;;;;;;;;;;;;;;;; File loading ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; Implicitly depends on cljs.compiler namespace
-(defn load-file*
-  "Sequentially read and evaluate the set of forms contained in the
-  file. Returns a compile-forms* map that contains the emitted
-  JavaScript string (:emit-str) and the output (:output)."
-  [name]
-  (cljs.compiler/compile-forms*
-    (cljs.compiler/forms-seq name)))
-
-(defn load-file
-  "Sequentially read and evaluate the set of forms contained in the
-  file."
-  [name]
-  (let [lf (load-file* name)]
-    (print (:output lf))
-    (dissoc lf :output :emit-str)))
-
 ;;;;;;;;;;;;;;;;;; Destructuring ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn destructure [bindings]
@@ -7429,6 +7410,44 @@ reduces them without incurring seq initialization"
     (with-meta (cons 'fn* decl)
       (meta &form))))
 (setMacro 'fn)
+
+;;;;;;;;;;;;;;;;;;; File loading ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Implicitly depends on cljs.analyzer and cljs.compiler namespaces
+(defn load-file*
+  "Sequentially read and evaluate the set of forms contained in the
+  file. Returns a compile-forms* map that contains the emitted
+  JavaScript string (:emit-str) and the output (:output)."
+  [name]
+  (binding [*ns-sym* *ns-sym*
+            cljs.analyzer/*cljs-ns* cljs.analyzer/*cljs-ns*]
+    (cljs.compiler/compile-forms*
+        (cljs.compiler/forms-seq name))))
+
+(defn load-file
+  "Sequentially read and evaluate the set of forms contained in the
+  file."
+  [name]
+  (let [lf (load-file* name)]
+    (print (:output lf))
+    (dissoc lf :output :emit-str)))
+
+(defn- root-resource
+  "Returns the root directory path for a lib"
+  {:tag String}
+  [lib]
+  (str \/
+       (.. (name lib)
+           (replace \- \_)
+           (replace \. \/))))
+
+(defn- lib->path
+  [lib]
+  (str "../src/cljs" (root-resource lib) ".cljs"))
+
+(defn require [& libs]
+  (doseq [lib libs]
+    (load-file (lib->path lib))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;; Macros from Clojure src/clj/clojure/core.clj ;;;;;;;;;;;;;;;;;;

@@ -853,10 +853,16 @@
 
 ;; implicit dependency on cljs.compiler
 (defn get-expander [sym env]
-  (let [var (resolve-existing-var (empty-env) sym)]
-    ;(println "// get-expander:" sym var)
-    (when (is-macro? sym)
-      (js/eval (str (cljs.compiler/munge (:name var)))))))
+  (let [mvar
+        (when-not (or (-> env :locals sym)        ;locals hide macros
+                      (and (or (-> env :ns :excludes sym)
+                               (get-in @namespaces [(-> env :ns :name) :excludes sym]))
+                           (not (or (-> env :ns :uses-macros sym)
+                                    (get-in @namespaces [(-> env :ns :name) :uses-macros sym])))))
+          (resolve-existing-var (empty-env) sym))]
+    ;(println "// get-expander:" sym mvar)
+    (when (and mvar (is-macro? sym))
+      (js/eval (str (cljs.compiler/munge (:name mvar)))))))
 
 (defn macroexpand-1 [env form]
   (let [op (first form)]
