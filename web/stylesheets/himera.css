@@ -99,6 +99,9 @@ ul.footer-links {
     -moz-border-radius: 5px;
     border: 1px solid #d5ceb4;
     padding: 10px;
+
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }
 /* The cursor. */
 .jqconsole-cursor {
