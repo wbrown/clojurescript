@@ -165,9 +165,10 @@
   nil)
 
 (defn emit-provide [sym]
-  (when-not (or (nil? *emitted-provides*) (contains? @*emitted-provides* sym))
-    (swap! *emitted-provides* conj sym)
-    (emitln "goog.provide('" (munge sym) "');")))
+  (when-not (goog.getObjectByName (str sym))
+    (when-not (or (nil? *emitted-provides*) (contains? @*emitted-provides* sym))
+      (swap! *emitted-provides* conj sym)
+      (emitln "goog.provide('" (munge sym) "');"))))
 
 
 (defn- emit-meta-constant [x & body]
