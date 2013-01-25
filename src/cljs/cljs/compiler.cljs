@@ -827,7 +827,11 @@
             ast (ana/analyze env (first forms))
             js-str (emit-str ast)
             code (str code js-str)
-            output (str output (with-out-str (js/eval js-str)))]
+            output1 (try
+                      (with-out-str (js/eval js-str))
+                      (catch js/Error e
+                        (throw (js/Error. (str "Failed to evaluate: " (pr-str js-str) "\n" e)))))
+            output (str output output1)]
         ;(print js-str)
         (if (= (:op ast) :ns)
           (recur (rest forms) (:name ast) (merge (:uses ast) (:requires ast)) code output)
