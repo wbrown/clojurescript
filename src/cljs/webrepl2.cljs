@@ -6,7 +6,7 @@
 (def ^:dynamic *debug* false)
 (def ^:dynamic *e nil)
 
-(defn prompt [] (str ana/*ns-sym* "=> "))
+(defn prompt [] (str *ns-sym* "=> "))
 
 (defn- read-next-form [text]
   (binding [*ns-sym* *ns-sym*]
