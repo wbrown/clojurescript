@@ -852,10 +852,10 @@
   ;; from read-string when trying to read 'cljs.core//
   (let [nss1 (update-in (dissoc (get @ana/namespaces ns) :requires-macros)
                         [:defs '/] assoc :name 'cljs.core/_SLASH_)
-        nss2 (update-in (read-string (pr-str nss1))
+        nss2 (update-in (reader/read-string (pr-str nss1))
                         [:defs '/] assoc :name (symbol "cljs.core//"))]
     (apply str
-      (emit (ana/analyze (ana/empty-env)
+      (emit-str (ana/analyze (ana/empty-env)
         (list 'swap! 'cljs.core/namespaces 'assoc (list 'quote ns) (list 'quote nss2)))))))
 
 
