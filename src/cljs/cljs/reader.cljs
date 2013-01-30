@@ -11,27 +11,117 @@
             [clojure.string :as string]
             [cljs.analyzer :as ana]))
 
-(defprotocol PushbackReader
-  (read-char [reader] "Returns the next char from the Reader,
-nil if the end of stream has been reached")
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; reader protocols
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(defprotocol Reader
+  (read-char [reader] "Returns the next char from the Reader, nil if the end of stream has been reached")
+  (peek-char [reader] "Returns the next char from the Reader without removing it from the reader stream"))
+
+(defprotocol IPushbackReader
   (unread [reader ch] "Push back a single character on to the stream"))
 
-; Using two atoms is less idomatic, but saves the repeat overhead of map creation
-(deftype StringPushbackReader [s index-atom buffer-atom]
-  PushbackReader
-  (read-char [reader]
-             (if (empty? @buffer-atom)
-               (let [idx @index-atom]
-                 (swap! index-atom inc)
-                 (aget s idx))
-               (let [buf @buffer-atom]
-                 (swap! buffer-atom rest)
-                 (first buf))))
-  (unread [reader ch] (swap! buffer-atom #(cons ch %))))
+(defprotocol IndexingReader
+  (get-line-number [reader])
+  (get-column-number [reader]))
 
-(defn push-back-reader [s]
-  "Creates a StringPushbackReader from a given string"
-  (StringPushbackReader. s (atom 0) (atom nil)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; reader deftypes
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(deftype StringReader
+    [s s-len ^:mutable s-pos]
+  Reader
+  (read-char [reader]
+    (when (> s-len s-pos)
+      (let [r (aget s s-pos)]
+        (set! s-pos (inc s-pos))
+        r)))
+  (peek-char [reader]
+    (when (> s-len s-pos)
+      (aget s s-pos))))
+
+(deftype PushbackReader
+    [rdr buf buf-len ^:mutable buf-pos]
+  Reader
+  (read-char [reader]
+    (if (< buf-pos buf-len)
+      (let [r (aget buf buf-pos)]
+        (set! buf-pos (inc set-pos))
+        r)
+      (read-char rdr)))
+  (peek-char [reader]
+    (if (< buf-pos buf-len)
+      (aget buf buf-pos)
+      (peek-char rdr)))
+  IPushbackReader
+  (unread [reader ch]
+    (when ch
+      (if (zero? buf-pos)
+        (throw (js/Error. "Pushback buffer is full")))
+      (set! buf-pos (dec buf-pos))
+      (aset buf buf-pos ch))))
+
+(declare newline?)
+
+(defn- normalize-newline [rdr ch]
+  (if (identical? \return ch)
+    (let [c (peek-char rdr)]
+      (when (identical? \formfeed c)
+        (read-char rdr))
+      \newline)
+    ch))
+
+(deftype IndexingPushbackReader
+    [rdr ^:mutable line ^:mutable column
+     ^:mutable line-start? ^:mutable prev]
+  Reader
+  (read-char [reader]
+    (when-let [ch (read-char rdr)]
+      (let [ch (normalize-newline rdr ch)]
+        (set! prev line-start?)
+        (set! line-start? (newline? ch))
+        (when line-start?
+          (set! column 0)
+          (set! line (inc line)))
+        (set! column (inc column))
+        ch)))
+
+  (peek-char [reader]
+    (peek-char rdr))
+
+  IPushbackReader
+  (unread [reader ch]
+    (when line-start? (set! line (dec line)))
+    (set! line-start? prev)
+    (set! column (dec column))
+    (unread rdr ch))
+
+  IndexingReader
+  (get-line-number [reader] (inc line))
+  (get-column-number [reader]  column))
+
+(defn string-reader
+  "Creates a StringReader from a given string"
+  ([s]
+     (StringReader. s (count s) 0)))
+
+(defn string-push-back-reader
+  "Creates a PushbackReader from a given string"
+  ([s]
+     (string-push-back-reader s 1))
+  ([s buf-len]
+     (PushbackReader. (string-reader s) (object-array buf-len) buf-len buf-len)))
+
+(defn indexing-push-back-reader
+  "Creates an IndexingPushbackReader from a given string"
+  ([s]
+     (IndexingPushbackReader.
+      (string-push-back-reader s) 0 1 true nil))
+  ([s buf-len]
+     (IndexingPushbackReader.
+      (string-push-back-reader s buf-len) 0 1 true nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; predicates
@@ -57,9 +147,7 @@ nil if the end of stream has been reached")
   [reader initch]
   (or (numeric? initch)
       (and (or (identical? \+ initch) (identical? \- initch))
-           (numeric? (let [next-ch (read-char reader)]
-                       (unread reader next-ch)
-                       next-ch)))))
+           (numeric? (peek-char reader)))))
 
 (declare read macros dispatch-macros)
 
@@ -568,12 +656,11 @@ nil if the end of stream has been reached")
   [rdr pct]
   (if (not @*arg-env*)
     (read-symbol rdr "%")
-    (let [ch (read-char rdr)]
-      (unread rdr ch)
+    (let [ch (peek-char rdr)]
       ;; % alone is first arg
       (if (or (nil? ch)
-                (whitespace? ch)
-                (macro-terminating? ch))
+              (whitespace? ch)
+              (macro-terminating? ch))
         (registerArg 1)
         (let [n (read rdr true nil true)]
           (cond
@@ -669,7 +756,7 @@ nil if the end of stream has been reached")
 (defn read-string
   "Reads one object from the string s"
   [s]
-  (let [r (push-back-reader s)]
+  (let [r (string-push-back-reader s)]
     (read r true nil false)))
 
 
