@@ -155,11 +155,13 @@
 ;; read helpers
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-; later will do e.g. line numbers...
+;; TODO: use ex-info
 (defn reader-error
   [rdr & msg]
-  (throw (js/Error. (apply str msg))))
+  (let [error-msg (apply str msg)]
+    (throw (js/Error. (str error-msg (when (instance? cljs.reader.IndexingReader rdr)
+                                       (str ", on line: " (get-line-number rdr)
+                                            ", on column: " (get-column-number rdr))))))))
 
 (defn ^boolean macro-terminating? [ch]
   (and (not (identical? ch "#"))
@@ -343,18 +345,23 @@
 
 (defn read-delimited-list
   [delim rdr recursive?]
-  (loop [a (transient [])]
-    (let [ch (read-past whitespace? rdr)]
-      (when-not ch (reader-error rdr "EOF while reading"))
-      (if (identical? delim ch)
-        (persistent! a)
-        (if-let [macrofn (macros ch)]
-          (let [mret (macrofn rdr ch)]
-            (recur (if (identical? mret rdr) a (conj! a mret))))
-          (do
-            (unread rdr ch)
-            (let [o (read rdr true nil recursive?)]
-              (recur (if (identical? o rdr) a (conj! a o))))))))))
+  (let [first-line (when (instance? blind.reader.IndexingReader rdr)
+                     (get-line-number rdr))]
+    (loop [a (transient [])]
+      (let [ch (read-past whitespace? rdr)]
+        (when-not ch
+          (reader-error rdr "EOF while reading"
+                        (if first-line
+                          (str ", starting at line" first-line))))
+        (if (identical? delim ch)
+          (persistent! a)
+          (if-let [macrofn (macros ch)]
+            (let [mret (macrofn rdr ch)]
+              (recur (if (identical? mret rdr) a (conj! a mret))))
+            (do
+              (unread rdr ch)
+              (let [o (read rdr true nil recursive?)]
+                (recur (if (identical? o rdr) a (conj! a o)))))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; data structure readers
@@ -382,7 +389,14 @@
 
 (defn read-list
   [rdr _]
-  (apply list (read-delimited-list ")" rdr true)))
+  (let [[line column] (when (instance? blind.reader.IndexingReader rdr)
+                        [(get-line-number rdr) (dec (get-column-number rdr))])
+        the-list (read-delimited-list \) rdr true)]
+    (if (empty? the-list)
+      '()
+      (with-meta (apply list the-list)
+        (when line
+          {:line line :column column})))))
 
 (def read-comment skip-line)
 
@@ -473,12 +487,19 @@
 
 (defn read-meta
   [rdr _]
-  (let [m (desugar-meta (read rdr true nil true))]
+  (let [[line column] (when (instance? blind.reader.IndexingReader rdr)
+                        [(get-line-number rdr) (dec (get-column-number rdr))])
+        m (desugar-meta (read rdr true nil true))]
     (when-not (map? m)
       (reader-error rdr "Metadata must be Symbol,Keyword,String or Map"))
     (let [o (read rdr true nil true)]
       (if (satisfies? IWithMeta o)
-        (with-meta o (merge (meta o) m))
+        (let [m (if (and line
+                         (seq? o))
+                  (assoc m :line line
+                         :column column)
+                  m)]
+          (with-meta o (merge (meta o) m)))
         (reader-error rdr "Metadata can only be applied to IWithMetas")))))
 
 (def UNQUOTE :__thisInternalKeywordRepresentsUnquoteToTheReader__)
