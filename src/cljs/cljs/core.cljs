@@ -5607,6 +5607,21 @@ reduces them without incurring seq initialization"
                    (reduce merge-entry (or m1 {}) (seq m2)))]
       (reduce merge2 maps))))
 
+(defn deep-merge-with
+  "Like merge-with, but merges maps recursively, applying the given fn
+  only when there's a non-map at a particular level.
+
+  (deepmerge + {:a {:b {:c 1 :d {:x 1 :y 2}} :e 3} :f 4}
+               {:a {:b {:c 2 :d {:z 9} :z 3} :e 100}})
+  -> {:a {:b {:z 3, :c 3, :d {:z 9, :x 1, :y 2}}, :e 103}, :f 4}"
+  [f & maps]
+  (apply
+    (fn m [& maps]
+      (if (every? map? maps)
+        (apply merge-with m maps)
+        (apply f maps)))
+    maps))
+
 (defn select-keys
   "Returns a map containing only those entries in map whose key is in keys"
   [map keyseq]
@@ -7393,7 +7408,7 @@ reduces them without incurring seq initialization"
                         (catch js/Error e 'cljs.core))
                       'cljs.core))
        name (symbol (name sym))]
-   (swap! namespaces assoc-in [:macros ns name] true))
+   (swap! namespaces assoc-in [ns :defs name :macro?] true))
    nil)
 
 ;during bootstrap we don't have destructuring let, loop or fn, will redefine later

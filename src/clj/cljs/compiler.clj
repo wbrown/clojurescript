@@ -784,7 +784,8 @@
 
 (defn ns-snap
   "Snapshot the given namespace. Returns the JavaScript to update
-  cljs.core/namespace based on the snapshot."
+  cljs.core/namespace based on the snapshot. Retains the :macro?
+  values from the existing namespaces atom."
   [ns]
   ;; Remove :requires-macros and munge '/ to work around an exception
   ;; from read-string when trying to read 'cljs.core//
@@ -794,7 +795,9 @@
                         [:defs '/] assoc :name (symbol "cljs.core//"))]
     (apply str
       (emit (ana/analyze (ana/empty-env)
-        (list 'swap! 'cljs.core/namespaces 'assoc (list 'quote ns) (list 'quote nss2)))))))
+        (list 'swap! 'cljs.core/namespaces 'update-in (vector (list 'quote ns))
+              (list 'fn (vector 'old) (list 'deep-merge-with (list 'fn (vector '& 'm) (list 'first 'm))
+                                            (list 'quote nss2) 'old)) ))))))
 
 
 (defn compile-file* [src dest]

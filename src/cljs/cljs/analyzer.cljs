@@ -845,11 +845,6 @@
       (assoc ret :op :var :info lb)
       (assoc ret :op :var :info (resolve-existing-var env sym)))))
 
-(defn is-macro? [sym]
-  (let [var (resolve-existing-var (empty-env) sym)
-        ns (:ns var)
-        name (symbol (name (:name var)))]
-    (get-in @namespaces [:macros ns name])))
 
 ;; implicit dependency on cljs.compiler
 (defn get-expander [sym env]
@@ -859,9 +854,15 @@
                                (get-in @namespaces [(-> env :ns :name) :excludes sym]))
                            (not (or (-> env :ns :uses-macros sym)
                                     (get-in @namespaces [(-> env :ns :name) :uses-macros sym])))))
-          (resolve-existing-var (empty-env) sym))]
-    ;(println "// get-expander:" sym mvar)
-    (when (and mvar (is-macro? sym))
+          (if-let [nstr (namespace sym)]
+            (if-let [ns (-> env :ns :requires-macros (get (symbol nstr)))]
+              (get-in ns [:defs (symbol (name sym))])
+              (resolve-existing-var (empty-env) sym))
+            (if-let [nsym (-> env :ns :uses-macros sym)]
+              (get-in @namespaces [nsym :defs sym])
+              (resolve-existing-var (empty-env) sym))))]
+;;    (println "// get-expander:" sym (type mvar) (keys mvar) (:macro? mvar))
+    (when (and mvar (:macro? mvar))
       (js/eval (str (cljs.compiler/munge (:name mvar)))))))
 
 (defn macroexpand-1 [env form]
