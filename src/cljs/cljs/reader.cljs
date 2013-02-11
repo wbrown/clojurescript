@@ -48,7 +48,7 @@
   (read-char [reader]
     (if (< buf-pos buf-len)
       (let [r (aget buf buf-pos)]
-        (set! buf-pos (inc set-pos))
+        (set! buf-pos (inc buf-pos))
         r)
       (read-char rdr)))
   (peek-char [reader]
@@ -137,6 +137,11 @@
   [ch]
   (gstring/isNumeric ch))
 
+(defn- ^boolean newline?
+  "Checks whether the character is a newline."
+  [ch]
+  (identical? "\n" ch))
+
 (defn- ^boolean comment-prefix?
   "Checks whether the character begins a comment."
   [ch]
@@ -159,7 +164,7 @@
 (defn reader-error
   [rdr & msg]
   (let [error-msg (apply str msg)]
-    (throw (js/Error. (str error-msg (when (instance? cljs.reader.IndexingReader rdr)
+    (throw (js/Error. (str error-msg (when (satisfies? cljs.reader.IndexingReader rdr)
                                        (str ", on line: " (get-line-number rdr)
                                             ", on column: " (get-column-number rdr))))))))
 
@@ -345,23 +350,19 @@
 
 (defn read-delimited-list
   [delim rdr recursive?]
-  (let [first-line (when (instance? blind.reader.IndexingReader rdr)
-                     (get-line-number rdr))]
-    (loop [a (transient [])]
-      (let [ch (read-past whitespace? rdr)]
-        (when-not ch
-          (reader-error rdr "EOF while reading"
-                        (if first-line
-                          (str ", starting at line" first-line))))
-        (if (identical? delim ch)
-          (persistent! a)
-          (if-let [macrofn (macros ch)]
-            (let [mret (macrofn rdr ch)]
-              (recur (if (identical? mret rdr) a (conj! a mret))))
-            (do
-              (unread rdr ch)
-              (let [o (read rdr true nil recursive?)]
-                (recur (if (identical? o rdr) a (conj! a o)))))))))))
+  (loop [a (transient [])]
+    (let [ch (read-past whitespace? rdr)]
+      (when-not ch
+        (reader-error rdr "EOF while reading"))
+      (if (identical? delim ch)
+        (persistent! a)
+        (if-let [macrofn (macros ch)]
+          (let [mret (macrofn rdr ch)]
+            (recur (if (identical? mret rdr) a (conj! a mret))))
+          (do
+            (unread rdr ch)
+            (let [o (read rdr true nil recursive?)]
+              (recur (if (identical? o rdr) a (conj! a o))))))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; data structure readers
@@ -389,7 +390,7 @@
 
 (defn read-list
   [rdr _]
-  (let [[line column] (when (instance? blind.reader.IndexingReader rdr)
+  (let [[line column] (when (satisfies? cljs.reader.IndexingReader rdr)
                         [(get-line-number rdr) (dec (get-column-number rdr))])
         the-list (read-delimited-list \) rdr true)]
     (if (empty? the-list)
@@ -487,7 +488,7 @@
 
 (defn read-meta
   [rdr _]
-  (let [[line column] (when (instance? blind.reader.IndexingReader rdr)
+  (let [[line column] (when (satisfies? cljs.reader.IndexingReader rdr)
                         [(get-line-number rdr) (dec (get-column-number rdr))])
         m (desugar-meta (read rdr true nil true))]
     (when-not (map? m)

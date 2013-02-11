@@ -965,7 +965,7 @@
               *cljs-file* f
               cljs.core/*ns-sym* *reader-ns-name*]
       (let [env (empty-env)
-            pbr (push-back-reader raw-string)
+            pbr (reader/string-push-back-reader raw-string)
             eof (js/Object.)]
         (loop [r (cljs.reader/read pbr false eof false)]
           (let [env (assoc env :ns (find-ns *cljs-ns*))]
