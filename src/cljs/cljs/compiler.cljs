@@ -246,6 +246,8 @@
       (emit-constant-map x))
   cljs.core/PersistentTreeMap (emit-constant [x]
       (emit-constant-map x))
+  cljs.core/ObjMap (emit-constant [x]
+      (emit-constant-map x))
   cljs.core/PersistentHashSet (emit-constant [x]
       (emit-constant-set x))
   cljs.core/PersistentTreeSet (emit-constant [x]
@@ -802,8 +804,7 @@
 (defn forms-seq
   "Seq of forms in a Clojure or ClojureScript file."
   ([f]
-     (forms-seq f (reader/string-push-back-reader (io/file-read f)))
-     #_(forms-seq f (reader/indexing-push-back-reader (io/file-read f))))
+     (forms-seq f (reader/indexing-push-back-reader (io/file-read f))))
   ([f rdr]
      (if-let [form (binding [cljs.core/*ns-sym* ana/*reader-ns-name*] (reader/read rdr nil nil))]
        (lazy-seq (cons form (forms-seq f rdr)))
