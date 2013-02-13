@@ -7434,10 +7434,11 @@ reduces them without incurring seq initialization"
   file. Returns a compile-forms* map that contains the emitted
   JavaScript string (:emit-str) and the output (:output)."
   [name]
+  ;; Use binding to restore *ns-sym* and *cljs-ns* after we're done
   (binding [*ns-sym* *ns-sym*
             cljs.analyzer/*cljs-ns* cljs.analyzer/*cljs-ns*]
-    (cljs.compiler/compile-forms*
-        (cljs.compiler/forms-seq name))))
+    (cljs.compiler/compile-and-eval-forms
+      (cljs.compiler/forms-seq name))))
 
 (defn load-file
   "Sequentially read and evaluate the set of forms contained in the
