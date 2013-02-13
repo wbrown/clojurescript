@@ -529,6 +529,7 @@
         :else
         (list 'list (syntaxQuote item))))))
 
+;; TODO: analyzer deps (specials and resolve-existing-var) should really be moved to cljs.core
 (defn syntaxQuote [form]
   (cond
     ;; (Compiler.isSpecial(form))
