@@ -22,7 +22,9 @@
   [& cmdline-args]
 
   ;; Setup the print function
-  (set! *print-fn* (.-print (js/require "util")))
+  (set! *out* #(.write (.-stdout js/process) %))
+  (set! *err* #(.write (.-stderr js/process) %))
+  (set! *print-fn* #(*out* %))
 
   (let [args (transform-cl-args cmdline-args)]
     (closure/build (:source args) (:options args))))

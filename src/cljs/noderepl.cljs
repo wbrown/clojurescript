@@ -41,13 +41,15 @@
   (ep text))
 
 (defn -main [& args]
-  ;; Setup the print function
-  (set! *print-fn* (.-print (js/require "util")))
-
   ;; Bootstrap an empty version of the cljs.user namespace
-  (swap! cljs.compiler/*emitted-provides* conj (symbol "cljs.user"))
+  (swap! comp/*emitted-provides* conj (symbol "cljs.user"))
   (.provide js/goog "cljs.user")
   (set! cljs.core/*ns-sym* (symbol "cljs.user"))
+
+  ;; Setup the print function
+  (set! *out* #(.write (.-stdout js/process) %))
+  (set! *err* #(.write (.-stderr js/process) %))
+  (set! *print-fn* #(*out* %))
 
   (println ";; ClojureScript")
   (println ";;   - http://github.com/kanaka/clojurescript")

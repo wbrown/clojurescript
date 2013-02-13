@@ -18,9 +18,6 @@
   ;;(:import java.lang.StringBuilder)
   )
 
-;; Stubs just to make it work
-(declare ^:dynamic *out*)
-
 (declare resolve-var)
 (declare resolve-existing-var)
 (declare warning)

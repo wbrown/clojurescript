@@ -50,7 +50,7 @@
        [:td {:class "cg"} (prompt)]
        [:td (.replace text #"\n$" "")]]]]))
 
-(defn ep [log text]
+(defn ep [text]
   (try
     (let [env (assoc (ana/empty-env) :context :expr)
           form (read-next-form text)
@@ -63,18 +63,18 @@
       (set! *3 *2)
       (set! *2 *1)
       (set! *1 value)
-      (repl-print log (pr-str value) "rtn"))
+      (binding [*out* *rtn*] (print (pr-str value))))
     (catch js/Error e
-      (repl-print log (.-stack e) "err")
+      (binding [*out* *err*] (print  (.-stack e)))
       (set! *e e))))
 
 (defn pep [log text]
  (postexpr log text)
- (ep log text))
+ (ep text))
 
 (set! (.-onload js/window) (fn []
   ;; Bootstrap an empty version of the cljs.user namespace
-  (swap! cljs.compiler/*emitted-provides* conj (symbol "cljs.user"))
+  (swap! comp/*emitted-provides* conj (symbol "cljs.user"))
   (.provide js/goog "cljs.user")
   (set! cljs.core/*ns-sym* (symbol "cljs.user"))
 
@@ -82,7 +82,13 @@
         input (.getElementById js/document "input")
         status1 (.getElementById js/document "status1")
         status2 (.getElementById js/document "status2")]
-    (set! *print-fn* #(repl-print log % nil))
+
+    ;; Setup the print function
+    ;; Setup the print function
+    (set! *out* #(repl-print log % nil))
+    (set! *rtn* #(repl-print log % "rtn"))
+    (set! *err* #(repl-print log % "err"))
+    (set! *print-fn* #(*out* %1))
 
     (println ";; ClojureScript")
     (append-dom log [:div {:class "cg"}

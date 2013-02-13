@@ -30,19 +30,14 @@
       (set! *e e)
       {:error (.-stack e)})))
 
-(defn- build-msg
-  [title msg klass]
-  {:msg (str title msg)
-   :className klass})
-
 (defn handle-input [input]
     (let [evaluated (evaluate-code input)]
       (if-let [err (and evaluated (:error evaluated))]
-        (build-msg "Compilation error: " err "jqconsole-message-error")
+        (binding [*out* *err*] (print "Compilation error:" err))
         (try
-          (build-msg "" (pr-str (:value evaluated)) "jqconsole-output")
+          (binding [*out* *rtn*] (print (pr-str (:value evaluated))))
           (catch js/Error e
-            (build-msg "Error: " e "jqconsole-message-error"))))))
+            (binding [*out* *err*] (println "Error:" err)))))))
 
 (defn complete-form? [text]
   (try
@@ -58,9 +53,8 @@
     (.SetPromptLabel js/jqconsole prompt-label continue-label)
     (.Prompt js/jqconsole "true"
              (fn [input]
-               (let [msg (handle-input input)]
-                 (.Write js/jqconsole (:msg msg) (:className msg))
-                 (start-prompt)))
+               (handle-input input)
+               (start-prompt))
              #(if (complete-form? %)
                 false
                 0))))
@@ -68,7 +62,7 @@
 (.ready (js/jQuery js/document)
   (fn []
     ;; Bootstrap an empty version of the cljs.user namespace
-    (swap! cljs.compiler/*emitted-provides* conj (symbol "cljs.user"))
+    (swap! comp/*emitted-provides* conj (symbol "cljs.user"))
     (.provide js/goog "cljs.user")
     (set! cljs.core/*ns-sym* (symbol "cljs.user"))
     
@@ -79,7 +73,13 @@
                       "\n>>> "
                       ""))
     (.SetIndentWidth js/jqconsole 1)
-    (set! *print-fn* #(.Write js/jqconsole %))
+
+    ;; Setup the print function
+    (set! *out* #(.Write js/jqconsole %))
+    (set! *rtn* #(.Write js/jqconsole % "jqconsole-output"))
+    (set! *err* #(.Write js/jqconsole % "jqconsole-message-error"))
+    (set! *print-fn* #(*out* %1))
+
     (start-prompt)
 
     ;; print,evaluate,print some example forms

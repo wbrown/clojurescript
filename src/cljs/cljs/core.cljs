@@ -17,6 +17,11 @@
 (def *unchecked-if* false)
 (def *assert* true)
 
+(def ^:dynamic *out*)
+(def ^:dynamic *err*)
+;; In web contexts there are other output streams
+(def ^:dynamic *rtn*)
+
 (def
   ^{:doc "Each runtime environment provides a diffenent way to print output.
   Whatever function *print-fn* is bound to will be passed any

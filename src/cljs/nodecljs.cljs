@@ -19,7 +19,9 @@
 
 (defn -main [file & args]
   ;; Setup the print function
-  (set! *print-fn* (.-print (js/require "util")))
+  (set! *out* (.-write (.-stdout js/process)))
+  (set! *err* (.-write (.-stderr js/process)))
+  (set! *print-fn* #(*out* %1))
 
   ;; Bootstrap an empty version of the cljs.user namespace
   (swap! cljs.compiler/*emitted-provides* conj (symbol "cljs.user"))
