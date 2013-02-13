@@ -18,7 +18,7 @@
     goog.require(ns);
 
     // Call the users's main function
-    cljs.core.apply.call(null,cljs.core._STAR_main_cli_fn_STAR_,cljs.core.drop.call(null,3,process.argv));
+    if(cljs.core._STAR_main_cli_fn_STAR_) cljs.core.apply.call(null,cljs.core._STAR_main_cli_fn_STAR_,cljs.core.drop.call(null,3,process.argv));
 })();
 
 

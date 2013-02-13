@@ -525,7 +525,8 @@
   (letfn [(parse-list [s] (when (> (count s) 0)
                             (-> (.substring s 1 (dec (count s)))
                                 (string/split #"'\s*,\s*'"))))]
-    (->> (reader/line-seq (reader/push-back-reader (io/file-read (io/resource "goog/deps.js"))))
+    (->> (reader/line-seq (reader/indexing-push-back-reader
+                            (io/file-read (io/resource "goog/deps.js"))))
          (map #(re-matches #"^goog\.addDependency\(['\"](.*)['\"],\s*\[(.*)\],\s*\[(.*)\]\);.*" %))
          (remove nil?)
          (map #(drop 1 %))

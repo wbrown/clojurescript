@@ -246,6 +246,8 @@
       (emit-constant-map x))
   cljs.core/PersistentTreeMap (emit-constant [x]
       (emit-constant-map x))
+  cljs.core/ObjMap (emit-constant [x]
+      (emit-constant-map x))
   cljs.core/PersistentHashSet (emit-constant [x]
       (emit-constant-set x))
   cljs.core/PersistentTreeSet (emit-constant [x]
@@ -802,9 +804,10 @@
 (defn forms-seq
   "Seq of forms in a Clojure or ClojureScript file."
   ([f]
-     (forms-seq f (reader/push-back-reader (io/file-read f))))
+     (forms-seq f (reader/indexing-push-back-reader (io/file-read f))))
   ([f rdr]
-     (if-let [form (binding [cljs.core/*ns-sym* ana/*reader-ns-name*] (reader/read rdr nil nil))]
+     (if-let [form (binding [cljs.core/*ns-sym* ana/*reader-ns-name*]
+                     (reader/read rdr nil nil))]
        (lazy-seq (cons form (forms-seq f rdr)))
        #_(close rdr))))
 
@@ -820,27 +823,40 @@
   (.mkdirs (.getParentFile (.getCanonicalFile f))))
 
 (defn compile-forms*
-  ([forms] (compile-forms* forms nil nil "" ""))
-  ([forms ns-name deps code output]
-    (if (seq forms)
-      (let [env (ana/empty-env)
-            ast (ana/analyze env (first forms))
-            js-str (emit-str ast)
-            code (str code js-str)
-            output1 (try
-                      (with-out-str (js/eval js-str))
-                      (catch js/Error e
-                        (throw (js/Error. (str "Failed to evaluate: " (pr-str js-str) "\n" e)))))
-            output (str output output1)]
-        ;(print js-str)
-        (if (= (:op ast) :ns)
-          (recur (rest forms) (:name ast) (merge (:uses ast) (:requires ast)) code output)
-          (recur (rest forms) ns-name deps code output)))
-      {:ns (or ns-name ana/*cljs-ns*)
-       :emit-str code
-       :output output
-       :provides [ns-name]
-       :requires (if (= ns-name 'cljs.core) (set (vals deps)) (conj (set (vals deps)) 'cljs.core))})))
+  [forms ns-name deps eval? code output]
+  (if (seq forms)
+    (let [env (ana/empty-env)
+          form (first forms)
+          ast (ana/analyze env form)
+          js-str (emit-str ast)
+          code (str code js-str)
+          output (str output
+                   (when eval?
+                     (try
+                       (with-out-str
+                         (js/eval js-str))
+                       (catch js/Error e
+                         (throw (js/Error.
+                                  (str e
+                                       (when (:line (meta form))
+                                         (str ", line " (:line (meta form))
+                                              ", column " (:column (meta form))))
+                                       "\n  while compiling form: " form
+                                       "\n  which emitted JavaScript: " (pr-str js-str))))))))]
+      ;(print js-str)
+      (if (= (:op ast) :ns)
+        (recur (rest forms) (:name ast) (merge (:uses ast) (:requires ast)) eval? code output)
+        (recur (rest forms) ns-name     deps                                eval? code output)))
+    {:ns (or ns-name ana/*cljs-ns*)
+     :emit-str code
+     :output output
+     :provides [ns-name]
+     :requires (if (= ns-name 'cljs.core) (set (vals deps)) (conj (set (vals deps)) 'cljs.core))}))
+
+(defn compile-forms [forms]
+  (compile-forms* forms nil nil false "" ""))
+(defn compile-and-eval-forms [forms]
+  (compile-forms* forms nil nil true "" ""))
 
 ;; (defmacro with-core-cljs
 ;;   "Ensure that core.cljs has been loaded."
@@ -870,7 +886,8 @@
               ana/*cljs-file* (.getPath src)
               *position* (atom [0 0])
               *emitted-provides* (atom #{})]
-      (let [cf (merge (compile-forms* (forms-seq src)) {:file (.getPath dest)})
+      (let [cf (merge (compile-forms (forms-seq src))
+                      {:file (io/file (.getPath dest))})
             ns-str (ns-snap (first (:provides cf)))
             write-str (str (:emit-str cf)
                            "\n// Analyzer namespace snapshot:\n"

@@ -17,6 +17,11 @@
 (def *unchecked-if* false)
 (def *assert* true)
 
+(def ^:dynamic *out*)
+(def ^:dynamic *err*)
+;; In web contexts there are other output streams
+(def ^:dynamic *rtn*)
+
 (def
   ^{:doc "Each runtime environment provides a diffenent way to print output.
   Whatever function *print-fn* is bound to will be passed any
@@ -5607,6 +5612,21 @@ reduces them without incurring seq initialization"
                    (reduce merge-entry (or m1 {}) (seq m2)))]
       (reduce merge2 maps))))
 
+(defn deep-merge-with
+  "Like merge-with, but merges maps recursively, applying the given fn
+  only when there's a non-map at a particular level.
+
+  (deepmerge + {:a {:b {:c 1 :d {:x 1 :y 2}} :e 3} :f 4}
+               {:a {:b {:c 2 :d {:z 9} :z 3} :e 100}})
+  -> {:a {:b {:z 3, :c 3, :d {:z 9, :x 1, :y 2}}, :e 103}, :f 4}"
+  [f & maps]
+  (apply
+    (fn m [& maps]
+      (if (every? map? maps)
+        (apply merge-with m maps)
+        (apply f maps)))
+    maps))
+
 (defn select-keys
   "Returns a map containing only those entries in map whose key is in keys"
   [map keyseq]
@@ -7393,7 +7413,7 @@ reduces them without incurring seq initialization"
                         (catch js/Error e 'cljs.core))
                       'cljs.core))
        name (symbol (name sym))]
-   (swap! namespaces assoc-in [:macros ns name] true))
+   (swap! namespaces assoc-in [ns :defs name :macro?] true))
    nil)
 
 ;during bootstrap we don't have destructuring let, loop or fn, will redefine later
@@ -7419,10 +7439,11 @@ reduces them without incurring seq initialization"
   file. Returns a compile-forms* map that contains the emitted
   JavaScript string (:emit-str) and the output (:output)."
   [name]
+  ;; Use binding to restore *ns-sym* and *cljs-ns* after we're done
   (binding [*ns-sym* *ns-sym*
             cljs.analyzer/*cljs-ns* cljs.analyzer/*cljs-ns*]
-    (cljs.compiler/compile-forms*
-        (cljs.compiler/forms-seq name))))
+    (cljs.compiler/compile-and-eval-forms
+      (cljs.compiler/forms-seq name))))
 
 (defn load-file
   "Sequentially read and evaluate the set of forms contained in the
