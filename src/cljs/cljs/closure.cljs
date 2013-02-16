@@ -388,6 +388,12 @@
   [^URL url]
   (last (string/split (.getFile url) #"\.jar!/")))
 
+(defn path-from-closure-lib
+  "Given the URL of a file within the closure library, return the path of the file
+  from the root of the library."
+  [^URL url]
+  (last (string/split url #"/library/closure/")))
+
 (defn jar-file-to-disk
   "Copy a file contained within a jar to disk. Return the created file."
   [url out-dir]
@@ -804,7 +810,7 @@
   directory."
   [js]
   (if-let [url ^URL (-url js)]
-    (path-from-jarfile url)
+    (path-from-closure-lib url)
     (str (random-string 5) ".js")))
 
 
@@ -826,8 +832,7 @@
   updated IJavaScript with the new location."
   [opts js]
   (let [url ^URL (-url js)]
-    ; if (or (not url) (= (.getProtocol url) "jar"))
-    (if (not url)
+    (if (or (not url) (re-find #"/closure/goog/" url))
       (write-javascript opts js)
       js)))
 
@@ -899,6 +904,9 @@
   [source opts]
 ;; TODO: what to do here?
 ;;  (ana/reset-namespaces!)
+  ;; We already have cljs.core, so don't emit a provide for it again
+  ;; during (load-core)
+  (swap! comp/*emitted-provides* conj (symbol "cljs.core"))
   (let [opts (if (= :nodejs (:target opts))
                (merge {:optimizations :simple} opts)
                opts)
