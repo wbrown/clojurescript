@@ -305,6 +305,7 @@
       (read-char reader))))
 
 (def unicode-2-pattern (re-pattern "[0-9A-Fa-f]{2}"))
+(def octal-pattern (re-pattern "[0-7]{1,3}"))
 (def unicode-4-pattern (re-pattern "[0-9A-Fa-f]{4}"))
 
 (defn validate-unicode-escape [unicode-pattern reader escape-char unicode-str]
@@ -312,8 +313,9 @@
     unicode-str
     (reader-error reader "Unexpected unicode escape \\" escape-char unicode-str)))
 
-(defn make-unicode-char [code-str]
-    (let [code (js/parseInt code-str 16)]
+(defn make-unicode-char [code-str & [base]]
+    (let [base (or base 16)
+          code (js/parseInt code-str base)]
       (.fromCharCode js/String code)))
 
 (defn escape-char
@@ -626,7 +628,7 @@
   (let [ch (read-char rdr)]
     (cond
       (= nil ch)
-      (reader-error rdr "EOF while reading character")
+      (reader-error rdr "EOF while reading unquote character")
 
       (= "@" ch)
       (let [o (read rdr true nil true)]
@@ -637,6 +639,42 @@
         (unread rdr ch)
         (let [o (read rdr true nil true)]
           (list UNQUOTE o))))))
+
+(defn read-character
+  [rdr _]
+  (let [ch (read-char rdr)]
+    (when (= nil ch) 
+      (reader-error rdr "EOF while reading character constant"))
+    (let [token (read-token rdr ch)]
+      (cond
+        (= 1 (count token))   token
+        (= "newline" token)   "\n"
+        (= "space" token)     " "
+        (= "tab" token)       "\t"
+        (= "backspace" token) "\b"
+        (= "formfeed" token)  "\f"
+        (= "return" token)    "\r"
+
+        (= "u" (first token))
+        (let [chars (apply str (rest token))]
+          (validate-unicode-escape unicode-4-pattern rdr "u" chars)
+          (let [c (make-unicode-char chars 16)
+                cval (js/parseInt chars 16)]
+            ;; surrogate code unit between \uD800 and \xDFFF?
+            (when (and (>= cval 55296) (<= cval 57343))
+              (reader-error rdr "Invalid character constant: \\" token))
+            c))
+
+        (= "o" (first token))
+        (let [chars (apply str (rest token))]
+          (validate-unicode-escape octal-pattern rdr "o" chars)
+          (let [c (make-unicode-char chars 8)
+                cval (js/parseInt chars 8)]
+            (when (> cval 0377)
+              (reader-error rdr "Octal escape sequence must be in range [0, 377]."))
+            c))
+
+        :else (reader-error rdr "Unsupported character: \\" token)))))
 
 (defn garg [n]
   (let [pre (if (= n -1) "rest" (str "p" n))]
@@ -737,7 +775,7 @@
    (identical? c \]) read-unmatched-delimiter
    (identical? c \{) read-map
    (identical? c \}) read-unmatched-delimiter
-   (identical? c \\) read-char
+   (identical? c \\) read-character
    (identical? c \%) read-arg
    (identical? c \#) read-dispatch
    :else nil))
