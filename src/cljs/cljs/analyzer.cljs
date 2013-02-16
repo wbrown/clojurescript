@@ -660,13 +660,13 @@
                 {} (remove (fn [[r]] (= r :refer-clojure)) args))]
     (when (seq @deps)
       ;; (analyze-deps @deps)
-      (println "**** Skipping analyze-deps ****")
+      (println "// **** Skipping analyze-deps ****")
       )
     (set! *cljs-ns* name)
     (set! cljs.core/*ns-sym* name)
     ;;(load-core)
     (doseq [nsym (concat (vals requires-macros) (vals uses-macros))]
-      (clojure.core/require nsym))
+      (cljs.core/require nsym))
     (swap! namespaces #(-> %
                            (assoc-in [name :name] name)
                            (assoc-in [name :doc] docstring)

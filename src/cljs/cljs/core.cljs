@@ -7468,7 +7468,8 @@ reduces them without incurring seq initialization"
 
 (defn require [& libs]
   (doseq [lib libs]
-    (load-file (lib->path lib))))
+    (when-not (get-in @namespaces [lib :defs])
+      (load-file (lib->path lib)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;; Macros from Clojure src/clj/clojure/core.clj ;;;;;;;;;;;;;;;;;;
