@@ -1,53 +1,17 @@
 (ns noderepl
-  (:require [cljs.core]
-            [cljs.analyzer :as ana]
-            [cljs.compiler :as comp]
-            [cljs.reader :as reader]))
-
-(def ^:dynamic *debug* false)
-(def ^:dynamic *e nil)
-
-(defn prompt [] (str *ns-sym* "=> "))
-
-(defn repl-print [text cls]
-  (doseq [line (.split (str text) #"\n")]
-    (when (= "err" cls)
-      (print "ERR: "))
-    (println line)))
-
-(defn- read-next-form [text]
-  (binding [*ns-sym* *ns-sym*]
-    (reader/read-string text)))
-
-(defn postexpr [text]
-  (println (str (prompt) text)))
-
-(defn ep [text]
-  (try
-    (let [env (assoc (ana/empty-env) :context :expr)
-          form (read-next-form text)
-          _ (when *debug* (println "READ:" (pr-str form)))
-          body (ana/analyze env form)
-          _ (when *debug* (println "ANALYZED:" (pr-str (:form body))))
-          res (comp/emit-str body)
-          _ (when *debug* (println "EMITTED:" (pr-str res)))]
-      (repl-print (pr-str (js/eval res)) "rtn"))
-    (catch js/Error e
-      (repl-print (.-stack e) "err")
-      (set! *e e))))
+  (:require [cljs.repl :as repl]))
 
 (defn pep [text]
-  (postexpr text)
-  (ep text))
+  (println (str (repl/prompt) text))
+  (repl/eval-print text)
+  (println))
 
 (defn -main [& args]
-  ;; Bootstrap an empty version of the cljs.user namespace
-  (swap! comp/*emitted-provides* conj (symbol "cljs.user"))
-  (.provide js/goog "cljs.user")
-  (set! cljs.core/*ns-sym* (symbol "cljs.user"))
+  (repl/init)
 
   ;; Setup the print function
   (set! *out* #(.write (.-stdout js/process) %))
+  (set! *rtn* #(.write (.-stdout js/process) %))
   (set! *err* #(.write (.-stderr js/process) %))
   (set! *print-fn* #(*out* %))
 
@@ -59,14 +23,16 @@
   (pep "(sqr 8)")
   (pep "(defmacro unless [pred a b] `(if (not ~pred) ~a ~b))")
   (pep "(unless false :yep :nope)")
+
   (let [readline (js/require "readline")
         rl (.createInterface readline js/process.stdin js/process.stdout)]
-    (.setPrompt rl (prompt))
+    (.setPrompt rl (repl/prompt))
     (.prompt rl)
     (.on rl "line" (fn [line]
                      (when (seq (filter #(not= " " %) line))
-                       (ep line))
-                     (.setPrompt rl (prompt))
+                       (repl/eval-print line)
+                       (println))
+                     (.setPrompt rl (repl/prompt))
                      (.prompt rl)))
     (.on rl "close" (fn [] (.exit js/process 0)))))
 
