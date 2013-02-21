@@ -85,6 +85,32 @@ ul.footer-links {
   color: #333;
 }
 
+.tiny-note {
+  font-size: small;
+}
+
+/* Editor ---------------------------------------------- */
+
+.CodeMirror {
+  position: relative;
+  height: 320px;
+  background: #fbfbf8;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  border: 1px solid #d5ceb4;
+}
+
+/* Console --------------------------------------------- */
+
+#console {
+  position: relative;
+  height: 220px;
+  background: #fbfbf8;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  border: 1px solid #d5ceb4;
+}
+
 /* Console --------------------------------------------- */
 /* The console container element */
 #console {
@@ -148,7 +174,7 @@ ul.footer-links {
 
 .jqconsole-inner { 
   /*width:580px;*/
-  height:300px; 
+  height:200px; 
   margin: 10px 10px;
   overflow:auto; 
   text-align:left;

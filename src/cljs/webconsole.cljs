@@ -31,10 +31,14 @@
       (.Write message "jqconsole-output"))
     prompt-text))
       
+(defn register-shortcuts [jqconsole shortcut-map]
+  (doseq [[key callback] shortcut-map]
+    (.RegisterShortcut jqconsole key callback)))
+      
 (defn console
   "Create and initialize the REPL console, with a shortcut-map that
    maps keys to callback functions."
-  [console-selector shortcut-map]
+  [console-selector]
   (repl/init)
   (let [jqconsole
         (.jqconsole (js/$ console-selector)
@@ -47,7 +51,4 @@
   (set! *rtn* #(.Write jqconsole % "jqconsole-output"))
   (set! *err* #(.Write jqconsole % "jqconsole-message-error"))
   (set! *print-fn* #(*out* %1))
-  ;; key binding
-  (doseq [[key callback] shortcut-map]
-    (.RegisterShortcut jqconsole key callback))
   (start-prompt jqconsole)))
