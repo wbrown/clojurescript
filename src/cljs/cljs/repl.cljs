@@ -39,7 +39,7 @@
       (let [output (evaluate-next-form rdr)]
         (if-not (:finished output)
           (if-let [err (:error output)]
-            (do (set! clojure.core/*e err)
+            (do (set! cljs.core/*e err)
                 output)
             (recur output))
           (do (set! *3 *2)
