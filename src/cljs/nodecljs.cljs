@@ -1,37 +1,21 @@
 (ns nodecljs
-  (:require [cljs.core]
-            [cljs.analyzer :as ana]
-            [cljs.compiler :as comp]
-            [cljs.reader :as reader]))
-
-(defn ep [text]
-  (let [r (reader/push-back-reader text)]
-    (loop [str (reader/read r false :eof false)]
-      (when (not= str :eof)
-        (try
-          (let [env (ana/empty-env)
-                res (comp/emit-str (ana/analyze env str))]
-            (js/eval res))
-          (catch js/Error e
-           (println e)
-           #_(set! *e e)))
-        (recur (reader/read r false :eof false))))))
+  (:require [cljs.repl :as repl]))
 
 (defn -main [file & args]
+  (repl/init)
+
   ;; Setup the print function
-  (set! *out* (.-write (.-stdout js/process)))
-  (set! *err* (.-write (.-stderr js/process)))
+  (set! *out* #(.write (.-stdout js/process) %))
+  (set! *rtn* identity)
+  (set! *err* #(.write (.-stderr js/process) %))
   (set! *print-fn* #(*out* %1))
 
-  ;; Bootstrap an empty version of the cljs.user namespace
-  (swap! cljs.compiler/*emitted-provides* conj (symbol "cljs.user"))
-  (.provide js/goog "cljs.user")
-  (set! cljs.core/*ns-sym* (symbol "cljs.user"))
-
-  ;(set! js/env (assoc js/env :context :expr))
+  ;(set! repl/*debug* true)
   (let [fs (js/require "fs")
-        text (.toString (.readFileSync fs file))]
-    (ep text)))
+        text (.toString (.readFileSync fs file))
+        res (repl/eval-print text)
+        ret (:value res)]
+    (.exit js/process (if (number? ret) ret 0))))
 
 (set! *main-cli-fn* -main)
 

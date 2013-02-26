@@ -1,13 +1,5 @@
 (ns webrepl
-  (:require [cljs.core]
-            [cljs.analyzer :as ana]
-            [cljs.compiler :as comp]
-            [cljs.reader :as reader]))
-
-(def ^:dynamic *debug* false)
-(def ^:dynamic *e nil)
-
-(defn prompt [] (str *ns-sym* "=> "))
+  (:require [cljs.repl :as repl]))
 
 (def append-dom)
 
@@ -38,45 +30,20 @@
        line]))
   (set! (.-scrollTop log) (.-scrollHeight log)))
 
-(defn- read-next-form [text]
-  (binding [*ns-sym* *ns-sym*]
-    (reader/read-string text)))
-
 (defn postexpr [log text]
   (append-dom log
     [:table
      [:tbody
       [:tr
-       [:td {:class "cg"} (prompt)]
+       [:td {:class "cg"} (repl/prompt)]
        [:td (.replace text #"\n$" "")]]]]))
-
-(defn ep [text]
-  (try
-    (let [env (assoc (ana/empty-env) :context :expr)
-          form (read-next-form text)
-          _ (when *debug* (println "READ:" (pr-str form)))
-          body (ana/analyze env form)
-          _ (when *debug* (println "ANALYZED:" (pr-str (:form body))))
-          res (comp/emit-str body)
-          _ (when *debug* (println "EMITTED:" (pr-str res)))
-          value (js/eval res)]
-      (set! *3 *2)
-      (set! *2 *1)
-      (set! *1 value)
-      (binding [*out* *rtn*] (print (pr-str value))))
-    (catch js/Error e
-      (binding [*out* *err*] (print  (.-stack e)))
-      (set! *e e))))
 
 (defn pep [log text]
  (postexpr log text)
- (ep text))
+ (repl/eval-print text))
 
 (set! (.-onload js/window) (fn []
-  ;; Bootstrap an empty version of the cljs.user namespace
-  (swap! comp/*emitted-provides* conj (symbol "cljs.user"))
-  (.provide js/goog "cljs.user")
-  (set! cljs.core/*ns-sym* (symbol "cljs.user"))
+  (repl/init)
 
   (let [log (.getElementById js/document "log")
         input (.getElementById js/document "input")
@@ -105,19 +72,16 @@
     (set! (.-onkeypress input)
           (fn [ev]
             (when (== (.-keyCode (or ev event)) 13)
-              (try
-                (let [form (reader/read-string (.-value input))]
+              (let [line (.-value input)]
+                (if (repl/complete-form? line)
                   (do
-                    (pep log (.-value input))
+                    (pep log line)
                     (js/setTimeout #(set! (.-value input) "") 0)
                     (set! (.-visibility (.-style status1)) "visible")
                     (set! (.-visibility (.-style status2)) "hidden")
-                    (set! (.-innerText (.getElementById js/document "ns")) (prompt))))
-                (catch js/Error e
-                  (if (re-find #"EOF while reading" (.-message e))
-                    (do
-                      (set! (.-visibility (.-style status1)) "hidden")
-                      (set! (.-visibility (.-style status2)) "visible"))
-                    (repl-print log e "err")))))))
+                    (set! (.-innerText (.getElementById js/document "ns")) (repl/prompt)))
+                  (do
+                    (set! (.-visibility (.-style status1)) "hidden")
+                    (set! (.-visibility (.-style status2)) "visible")))))))
 
     (.focus input))))

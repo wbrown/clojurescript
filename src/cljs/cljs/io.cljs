@@ -1,5 +1,14 @@
 (ns cljs.io)
 
+;; Will be made absolute later if we can
+(def ^:dynamic *clojurescript-home* "../")
+
+;; Each is appended to *clojurescript-home* to form the "classpath"
+(def ^:dynamic *classpath-suffixes* ["closure/library/closure/"
+                                     "src/cljs/"
+                                     "test/cljs/"
+                                     "./"])
+
 (def is-node? (if (try js/require (catch js/Error e nil)) true false))
 (def node-fs (if is-node? (js/require "fs") nil))
 (def node-path (if is-node? (js/require "path") nil))
@@ -180,17 +189,19 @@
      (map #(cljs.io.File. (str d path-separator %)) (.listFiles d)))
    dir))
 
+;; Make *clojurescript-home* absolute if possible
+(when is-node?
+  (let [prog (path-dirname (aget (.-argv js/process) 1))]
+    (set! *clojurescript-home* (path-resolve (str prog "/..")))))
 
-;; TODO: this should search the "classpath" to find the object
-(defn resource [path]    
-  (let [p0 path
-        p1 (str "out2/" path)
-        p2 (str "../src/cljs/" path)
-        p3 (str "../closure/library/closure/" path)]
-    (cond
-      (file-exists? p0) p0
-      (file-exists? p1) p1
-      (file-exists? p2) p2
-      (file-exists? p3) p3
-      :else nil
-      )))
+(defn resource
+  "Find the file on the \"classpath\" (which consists of every element
+  of *classpath-suffixes* appended to *clojurescript-home*. Only works
+  in Node mode for now."
+  [file]
+  (if (and (= "/" (first file)) (file-exists? file))
+    (path-resolve file)
+    (let [finder #(let [p (str cljs.io/*clojurescript-home* "/" % "/" file)]
+                    (when (cljs.io/file-exists? p) p))
+          found (some finder *classpath-suffixes*)]
+      (when found (path-resolve found)))))
