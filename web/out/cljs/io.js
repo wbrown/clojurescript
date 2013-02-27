@@ -1,12 +1,14 @@
 goog.provide('cljs.io');
 goog.require('cljs.core');
+cljs.io._STAR_clojurescript_home_STAR_ = "../";
+cljs.io._STAR_classpath_suffixes_STAR_ = cljs.core.PersistentVector.fromArray(["closure/library/closure/","src/cljs/","test/cljs/","./"], true);
 cljs.io.is_node_QMARK_ = (cljs.core.truth_((function (){try{return require;
-}catch (e4611){if(cljs.core.instance_QMARK_.call(null,Error,e4611))
-{var e = e4611;
+}catch (e4680){if(cljs.core.instance_QMARK_.call(null,Error,e4680))
+{var e = e4680;
 return null;
 } else
 {if("\uFDD0'else")
-{throw e4611;
+{throw e4680;
 } else
 {return null;
 }
@@ -17,33 +19,33 @@ cljs.io.node_path = (cljs.core.truth_(cljs.io.is_node_QMARK_)?require("path"):nu
 cljs.io.path_separator = (cljs.core.truth_(cljs.io.is_node_QMARK_)?cljs.io.node_path.sep:"/");
 cljs.io.IFile = {};
 cljs.io.file_read = (function file_read(f){
-var path = (((function (){var G__4614 = f;
-if(G__4614)
+var path = (((function (){var G__4683 = f;
+if(G__4683)
 {if(cljs.core.truth_((function (){var or__3824__auto__ = null;
 if(cljs.core.truth_(or__3824__auto__))
 {return or__3824__auto__;
 } else
-{return G__4614.cljs$io$IFile$;
+{return G__4683.cljs$io$IFile$;
 }
 })()))
 {return true;
 } else
-{if((!G__4614.cljs$lang$protocol_mask$partition$))
-{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4614);
+{if((!G__4683.cljs$lang$protocol_mask$partition$))
+{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4683);
 } else
 {return false;
 }
 }
 } else
-{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4614);
+{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4683);
 }
 })())?f.getPath():f);
 if(cljs.core.truth_(cljs.io.is_node_QMARK_))
 {return cljs.io.node_fs.readFileSync(path).toString();
 } else
-{var req = (function (){var G__4615 = (new XMLHttpRequest());
-G__4615.open("GET",path,false);
-return G__4615;
+{var req = (function (){var G__4684 = (new XMLHttpRequest());
+G__4684.open("GET",path,false);
+return G__4684;
 })();
 req.send();
 if(cljs.core._EQ_.call(null,200,req.status))
@@ -54,25 +56,25 @@ if(cljs.core._EQ_.call(null,200,req.status))
 }
 });
 cljs.io.file_write = (function file_write(f,data){
-var path = (((function (){var G__4617 = f;
-if(G__4617)
+var path = (((function (){var G__4686 = f;
+if(G__4686)
 {if(cljs.core.truth_((function (){var or__3824__auto__ = null;
 if(cljs.core.truth_(or__3824__auto__))
 {return or__3824__auto__;
 } else
-{return G__4617.cljs$io$IFile$;
+{return G__4686.cljs$io$IFile$;
 }
 })()))
 {return true;
 } else
-{if((!G__4617.cljs$lang$protocol_mask$partition$))
-{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4617);
+{if((!G__4686.cljs$lang$protocol_mask$partition$))
+{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4686);
 } else
 {return false;
 }
 }
 } else
-{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4617);
+{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4686);
 }
 })())?f.getPath():f);
 if(cljs.core.truth_(cljs.io.is_node_QMARK_))
@@ -155,10 +157,10 @@ if(cljs.core.not.call(null,cljs.io.file_exists_QMARK_.call(null,cur)))
 {}
 if(left)
 {{
-var G__4618 = [cljs.core.str(cur),cljs.core.str(cljs.core.first.call(null,left)),cljs.core.str("/")].join('');
-var G__4619 = cljs.core.next.call(null,left);
-cur = G__4618;
-left = G__4619;
+var G__4687 = [cljs.core.str(cur),cljs.core.str(cljs.core.first.call(null,left)),cljs.core.str("/")].join('');
+var G__4688 = cljs.core.next.call(null,left);
+cur = G__4687;
+left = G__4688;
 continue;
 }
 } else
@@ -262,70 +264,70 @@ cljs.io.File.prototype.cljs$io$IFile$ = true;
 cljs.io.file = (function() {
 var file = null;
 var file__1 = (function (path){
-var path__$1 = (((function (){var G__4624 = path;
-if(G__4624)
+var path__$1 = (((function (){var G__4693 = path;
+if(G__4693)
 {if(cljs.core.truth_((function (){var or__3824__auto__ = null;
 if(cljs.core.truth_(or__3824__auto__))
 {return or__3824__auto__;
 } else
-{return G__4624.cljs$io$IFile$;
+{return G__4693.cljs$io$IFile$;
 }
 })()))
 {return true;
 } else
-{if((!G__4624.cljs$lang$protocol_mask$partition$))
-{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4624);
+{if((!G__4693.cljs$lang$protocol_mask$partition$))
+{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4693);
 } else
 {return false;
 }
 }
 } else
-{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4624);
+{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4693);
 }
 })())?path.getPath():path);
 return (new cljs.io.File(path__$1));
 });
 var file__2 = (function (parent,path){
-var parent__$1 = (((function (){var G__4625 = parent;
-if(G__4625)
+var parent__$1 = (((function (){var G__4694 = parent;
+if(G__4694)
 {if(cljs.core.truth_((function (){var or__3824__auto__ = null;
 if(cljs.core.truth_(or__3824__auto__))
 {return or__3824__auto__;
 } else
-{return G__4625.cljs$io$IFile$;
+{return G__4694.cljs$io$IFile$;
 }
 })()))
 {return true;
 } else
-{if((!G__4625.cljs$lang$protocol_mask$partition$))
-{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4625);
+{if((!G__4694.cljs$lang$protocol_mask$partition$))
+{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4694);
 } else
 {return false;
 }
 }
 } else
-{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4625);
+{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4694);
 }
 })())?parent.getPath():parent);
-var path__$1 = (((function (){var G__4626 = path;
-if(G__4626)
+var path__$1 = (((function (){var G__4695 = path;
+if(G__4695)
 {if(cljs.core.truth_((function (){var or__3824__auto__ = null;
 if(cljs.core.truth_(or__3824__auto__))
 {return or__3824__auto__;
 } else
-{return G__4626.cljs$io$IFile$;
+{return G__4695.cljs$io$IFile$;
 }
 })()))
 {return true;
 } else
-{if((!G__4626.cljs$lang$protocol_mask$partition$))
-{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4626);
+{if((!G__4695.cljs$lang$protocol_mask$partition$))
+{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4695);
 } else
 {return false;
 }
 }
 } else
-{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4626);
+{return cljs.core.type_satisfies_.call(null,cljs.io.IFile,G__4695);
 }
 })())?path.getPath():path);
 return (new cljs.io.File([cljs.core.str(parent__$1),cljs.core.str(cljs.io.path_separator),cljs.core.str(path__$1)].join('')));
@@ -351,35 +353,44 @@ cljs.io.file_seq = (function file_seq(dir){
 return cljs.core.tree_seq.call(null,(function (f){
 return f.isDirectory();
 }),(function (d){
-return cljs.core.map.call(null,(function (p1__4620_SHARP_){
-return (new cljs.io.File([cljs.core.str(d),cljs.core.str(cljs.io.path_separator),cljs.core.str(p1__4620_SHARP_)].join('')));
+return cljs.core.map.call(null,(function (p1__4689_SHARP_){
+return (new cljs.io.File([cljs.core.str(d),cljs.core.str(cljs.io.path_separator),cljs.core.str(p1__4689_SHARP_)].join('')));
 }),d.listFiles());
 }),dir);
 });
-cljs.io.resource = (function resource(path){
-var p0 = path;
-var p1 = [cljs.core.str("out2/"),cljs.core.str(path)].join('');
-var p2 = [cljs.core.str("../src/cljs/"),cljs.core.str(path)].join('');
-var p3 = [cljs.core.str("../closure/library/closure/"),cljs.core.str(path)].join('');
-if(cljs.core.truth_(cljs.io.file_exists_QMARK_.call(null,p0)))
-{return p0;
+if(cljs.core.truth_(cljs.io.is_node_QMARK_))
+{var prog_4697 = cljs.io.path_dirname.call(null,(process.argv[1]));
+cljs.io._STAR_clojurescript_home_STAR_ = cljs.io.path_resolve.call(null,[cljs.core.str(prog_4697),cljs.core.str("/..")].join(''));
 } else
-{if(cljs.core.truth_(cljs.io.file_exists_QMARK_.call(null,p1)))
-{return p1;
+{}
+/**
+* Find the file on the "classpath" (which consists of every element
+* of *classpath-suffixes* appended to *clojurescript-home*. Only works
+* in Node mode for now.
+*/
+cljs.io.resource = (function resource(file){
+if(cljs.core.truth_((function (){var and__3822__auto__ = cljs.core._EQ_.call(null,"/",cljs.core.first.call(null,file));
+if(and__3822__auto__)
+{return cljs.io.file_exists_QMARK_.call(null,file);
 } else
-{if(cljs.core.truth_(cljs.io.file_exists_QMARK_.call(null,p2)))
-{return p2;
+{return and__3822__auto__;
+}
+})()))
+{return cljs.io.path_resolve.call(null,file);
 } else
-{if(cljs.core.truth_(cljs.io.file_exists_QMARK_.call(null,p3)))
-{return p3;
+{var finder = (function (p1__4696_SHARP_){
+var p = [cljs.core.str(cljs.io._STAR_clojurescript_home_STAR_),cljs.core.str("/"),cljs.core.str(p1__4696_SHARP_),cljs.core.str("/"),cljs.core.str(file)].join('');
+if(cljs.core.truth_(cljs.io.file_exists_QMARK_.call(null,p)))
+{return p;
 } else
-{if("\uFDD0'else")
 {return null;
+}
+});
+var found = cljs.core.some.call(null,finder,cljs.io._STAR_classpath_suffixes_STAR_);
+if(cljs.core.truth_(found))
+{return cljs.io.path_resolve.call(null,found);
 } else
 {return null;
-}
-}
-}
 }
 }
 });
@@ -387,23 +398,23 @@ if(cljs.core.truth_(cljs.io.file_exists_QMARK_.call(null,p0)))
 // Analyzer namespace snapshot:
 cljs.core.swap_BANG_.call(null,cljs.core.namespaces,cljs.core.update_in,cljs.core.PersistentVector.fromArray([(new cljs.core.Symbol(null,"cljs.io"))], true),(function (old){
 return cljs.core.deep_merge_with.call(null,(function() { 
-var G__4627__delegate = function (m){
+var G__4698__delegate = function (m){
 return cljs.core.first.call(null,m);
 };
-var G__4627 = function (var_args){
+var G__4698 = function (var_args){
 var m = null;
 if (goog.isDef(var_args)) {
   m = cljs.core.array_seq(Array.prototype.slice.call(arguments, 0),0);
 } 
-return G__4627__delegate.call(this, m);
+return G__4698__delegate.call(this, m);
 };
-G__4627.cljs$lang$maxFixedArity = 0;
-G__4627.cljs$lang$applyTo = (function (arglist__4628){
-var m = cljs.core.seq(arglist__4628);;
-return G__4627__delegate(m);
+G__4698.cljs$lang$maxFixedArity = 0;
+G__4698.cljs$lang$applyTo = (function (arglist__4699){
+var m = cljs.core.seq(arglist__4699);;
+return G__4698__delegate(m);
 });
-G__4627.cljs$lang$arity$variadic = G__4627__delegate;
-return G__4627;
+G__4698.cljs$lang$arity$variadic = G__4698__delegate;
+return G__4698;
 })()
-,cljs.core.hash_map("\uFDD0'defs",cljs.core.hash_map((new cljs.core.Symbol(null,"file-write")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"f")),(new cljs.core.Symbol(null,"data"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"f")),"\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"data")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/file-write")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",22,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"file")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]),cljs.core.vec([(new cljs.core.Symbol(null,"parent")),(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)]),cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"parent")),"\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/file")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",164,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"path-dirname")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/path-dirname")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",65,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"is-node?")),cljs.core.hash_map("\uFDD0'line",3,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs","\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/is-node?"))),(new cljs.core.Symbol(null,"mkdirs")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/mkdirs")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",83,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"/")),cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"cljs.core//"))),(new cljs.core.Symbol(null,"mkdir")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/mkdir")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",77,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"node-path")),cljs.core.hash_map("\uFDD0'line",5,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs","\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/node-path"))),(new cljs.core.Symbol(null,"file-read")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"f"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"f")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/file-read")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",10,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"file-is-dir?")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/file-is-dir?")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",35,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"path-resolve")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/path-resolve")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",59,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"file-exists?")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/file-exists?")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",29,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"node-fs")),cljs.core.hash_map("\uFDD0'line",4,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs","\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/node-fs"))),(new cljs.core.Symbol(null,"resource")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/resource")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",185,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"file-seq")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"dir"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"dir")),"\uFDD0'tag",(new cljs.core.Symbol(null,"cljs.io.File")),"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/file-seq")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'doc","A tree seq on cljs.io.Files","\uFDD0'line",173,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"file-readdir")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/file-readdir")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",41,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"path-separator")),cljs.core.hash_map("\uFDD0'line",7,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs","\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/path-separator"))),(new cljs.core.Symbol(null,"path-normalize")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/path-normalize")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",53,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"IFile")),cljs.core.hash_map("\uFDD0'line",8,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs","\uFDD0'protocol-symbol",true,"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/IFile"))),(new cljs.core.Symbol(null,"File")),cljs.core.hash_map("\uFDD0'line",93,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs","\uFDD0'protocols",cljs.core.set([(new cljs.core.Symbol(null,"cljs.io/Object")),(new cljs.core.Symbol(null,"cljs.io/IFile")),(new cljs.core.Symbol(null,"cljs.core/IPrintWithWriter"))]),"\uFDD0'num-fields",1,"\uFDD0'type",true,"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/File"))),(new cljs.core.Symbol(null,"path-basename")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/path-basename")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",71,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"file-stat")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/file-stat")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",47,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs")),"\uFDD0'imports",null,"\uFDD0'uses-macros",null,"\uFDD0'requires",null,"\uFDD0'uses",null,"\uFDD0'excludes",cljs.core.set([]),"\uFDD0'doc",null,"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io"))),old);
+,cljs.core.hash_map("\uFDD0'defs",cljs.core.hash_map((new cljs.core.Symbol(null,"file-write")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"f")),(new cljs.core.Symbol(null,"data"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"f")),"\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"data")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/file-write")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",31,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"*clojurescript-home*")),cljs.core.hash_map("\uFDD0'line",4,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs","\uFDD0'dynamic",true,"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/*clojurescript-home*"))),(new cljs.core.Symbol(null,"file")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]),cljs.core.vec([(new cljs.core.Symbol(null,"parent")),(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)]),cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"parent")),"\uFDD0'tag",null,"\uFDD0'shadow",null),cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/file")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",2,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",173,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"path-dirname")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/path-dirname")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",74,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"is-node?")),cljs.core.hash_map("\uFDD0'line",12,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs","\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/is-node?"))),(new cljs.core.Symbol(null,"mkdirs")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/mkdirs")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",92,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"/")),cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"cljs.core//"))),(new cljs.core.Symbol(null,"mkdir")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/mkdir")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",86,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"node-path")),cljs.core.hash_map("\uFDD0'line",14,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs","\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/node-path"))),(new cljs.core.Symbol(null,"file-read")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"f"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"f")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/file-read")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",19,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"file-is-dir?")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/file-is-dir?")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",44,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"path-resolve")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/path-resolve")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",68,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"file-exists?")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/file-exists?")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",38,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"node-fs")),cljs.core.hash_map("\uFDD0'line",13,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs","\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/node-fs"))),(new cljs.core.Symbol(null,"resource")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"file"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"file")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/resource")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'doc","Find the file on the \"classpath\" (which consists of every element\n  of *classpath-suffixes* appended to *clojurescript-home*. Only works\n  in Node mode for now.","\uFDD0'line",197,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"file-seq")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"dir"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"dir")),"\uFDD0'tag",(new cljs.core.Symbol(null,"cljs.io.File")),"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/file-seq")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'doc","A tree seq on cljs.io.Files","\uFDD0'line",182,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"*classpath-suffixes*")),cljs.core.hash_map("\uFDD0'line",7,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs","\uFDD0'dynamic",true,"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/*classpath-suffixes*"))),(new cljs.core.Symbol(null,"file-readdir")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/file-readdir")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",50,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"path-separator")),cljs.core.hash_map("\uFDD0'line",16,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs","\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/path-separator"))),(new cljs.core.Symbol(null,"path-normalize")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/path-normalize")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",62,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"IFile")),cljs.core.hash_map("\uFDD0'line",17,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs","\uFDD0'protocol-symbol",true,"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/IFile"))),(new cljs.core.Symbol(null,"File")),cljs.core.hash_map("\uFDD0'line",102,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs","\uFDD0'protocols",cljs.core.set([(new cljs.core.Symbol(null,"cljs.io/Object")),(new cljs.core.Symbol(null,"cljs.io/IFile")),(new cljs.core.Symbol(null,"cljs.core/IPrintWithWriter"))]),"\uFDD0'num-fields",1,"\uFDD0'type",true,"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/File"))),(new cljs.core.Symbol(null,"path-basename")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/path-basename")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",80,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs"),(new cljs.core.Symbol(null,"file-stat")),cljs.core.hash_map("\uFDD0'arglists",cljs.core.list((new cljs.core.Symbol(null,"quote")),cljs.core.list(cljs.core.vec([(new cljs.core.Symbol(null,"path"))]))),"\uFDD0'method-params",cljs.core.list(cljs.core.vec([cljs.core.hash_map("\uFDD0'name",(new cljs.core.Symbol(null,"path")),"\uFDD0'tag",null,"\uFDD0'shadow",null)])),"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io/file-stat")),"\uFDD0'protocol-impl",null,"\uFDD0'max-fixed-arity",1,"\uFDD0'private",true,"\uFDD0'protocol-inline",null,"\uFDD0'variadic",false,"\uFDD0'line",56,"\uFDD0'fn-var",true,"\uFDD0'file","/data2/joelm/personal/clj/clojurescript/src/cljs/cljs/io.cljs")),"\uFDD0'imports",null,"\uFDD0'uses-macros",null,"\uFDD0'requires",null,"\uFDD0'uses",null,"\uFDD0'excludes",cljs.core.set([]),"\uFDD0'doc",null,"\uFDD0'name",(new cljs.core.Symbol(null,"cljs.io"))),old);
 }));
