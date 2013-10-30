@@ -5,14 +5,14 @@ set -e
 mkdir -p lib
 
 echo "Fetching Clojure..."
-curl -O -s http://repo1.maven.org/maven2/org/clojure/clojure/1.4.0/clojure-1.4.0.zip
-unzip -qu clojure-1.4.0.zip
-echo "Copying clojure-1.4.0/clojure-1.4.0.jar to lib/clojure.jar..."
-cp clojure-1.4.0/clojure-1.4.0.jar lib/clojure.jar
+curl -O -s http://repo1.maven.org/maven2/org/clojure/clojure/1.5.1/clojure-1.5.1.zip
+unzip -qu clojure-1.5.1.zip
+echo "Copying clojure-1.5.1/clojure-1.5.1.jar to lib/clojure.jar..."
+cp clojure-1.5.1/clojure-1.5.1.jar lib/clojure.jar
 echo "Cleaning up Clojure directory..."
-rm -rf clojure-1.4.0/
+rm -rf clojure-1.5.1/
 echo "Cleaning up Clojure archive..."
-rm clojure-1.4.0.zip
+rm clojure-1.5.1.zip
 
 echo "Fetching Google Closure library..."
 mkdir -p closure/library
@@ -34,7 +34,7 @@ if [ "$1" = "--closure-library-head" ] ; then
     fi
 else
     echo "Fetching Google Closure library..."
-    f=closure-library-20111110-r1376.zip
+    f=closure-library-20130212-95c19e7f0f5f.zip
     curl -O -s "http://closure-library.googlecode.com/files/$f"
     unzip -qu "$f"
     echo "Cleaning up Google Closure library archive..."
