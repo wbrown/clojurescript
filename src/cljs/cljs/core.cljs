@@ -8609,7 +8609,7 @@ reduces them without incurring seq initialization"
                                 (conj (pop groups) (conj (peek groups) [k v]))
                                 (conj groups [k v])))
                             [] (partition 2 seq-exprs)))
-        err (fn [& msg] (throw (js/Error. (apply core/str msg))))
+        err (fn [& msg] (throw (js/Error. (apply cljs.core/str msg))))
         emit-bind (fn emit-bind [[[bind expr & mod-pairs]
                                   & [[_ next-expr] :as next-groups]]]
                     (let [giter (gensym "iter__")
