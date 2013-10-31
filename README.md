@@ -58,20 +58,42 @@ goal of being fully self-hosting (i.e. ClojureScript-in-ClojureScript).
 
 ### Build
 
-You can rebuild the ClojureScript analyzer, compiler, reader and
-browser bootstrap pieces with a web REPL like this:
+The ClojureScript-in-ClojureScript compiler is compiled using Clojure (i.e. on the JVM).
+
+First, run `./script/bootstrap` which downloads the necessary dependencies: Clojure, Google Closure Library, Google Closure Compiler, and Rhino. This must be run from the root project directory.
+
+Next, run `./script/compile` to build the compiler. This might give off some warnings, but that's okay.
+
+You should now have a functioning ClojureScript compiler at `./bin/cljs`.
+
+
+### Usage
+
+The `./bin/cljsc` script takes a file or project directory containing .cljs files. It creates an `out` folder with your compiled JavaScript.  It optionally accepts a second argument with Google Closure Compiler options, although it currently won't work with any optimization mode other than `{:optimizations :none}` (the default).
+
+After building a cljs project, you will need to copy `./src/cljs/goog.js` into the `out` directory created by compilation if it doesn't already exist there.
+
+### Examples
+
+#### Web REPL
+There is a sample project (a web-based REPL) you can build and play with inside the `web` directory.
+
+It comes with a build script:
 
 ```
 cd web
-../bin/cljsc ../src/cljs/webrepl.cljs > webrepl.js
+./build2.sh
 ```
-Now load the `web/jsrepl.html` file in a browser.
+
+Now open the `web/repl.html` file in a browser.
+
+#### Node.js REPL
 
 For a REPL in Node.js, build the `src/cljs/noderepl.cljs` code:
 
 ```
 cd node
-../bin/cljsc ../src/cljs/noderepl.cljs > noderepl.js
+../bin/cljsc ../noderepl.cljs > noderepl.js
 cp ../src/cljs/goog.js out/
 ```
 
@@ -81,6 +103,7 @@ Now use the `run.js` bootstrap code to launch the repl:
 ./run.js noderepl.js
 ```
 
+#### Node.js compilation/evaluation
 For direct *.cljs file compilation/evaluation, build the nodecljs.cljs compiler:
 
 ```
