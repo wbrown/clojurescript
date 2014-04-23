@@ -281,8 +281,8 @@
         body (if name (pop body) body)
         try (when body
               (analyze-block (if (or name finally) catchenv env) body))]
-    (when name (assert (not (or (namespace name)
-                                (= (namespace name) "js")))
+    (when name (assert (not (and (namespace name)
+                                (not= (namespace name) "js")))
                                 "Can't qualify symbol in catch"))
     {:env env :op :try* :form form
      :try try
