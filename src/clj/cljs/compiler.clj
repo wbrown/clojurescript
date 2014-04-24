@@ -523,34 +523,22 @@
     ;(when statements (emits "}"))
     (when (and statements (= :expr context)) (emits "})()"))))
 
-(defmethod emit :try*
+(defmethod emit :try
   [{:keys [env try catch name finally]}]
-  (let [context (:context env)
-        subcontext (if (= :expr context) :return context)]
+  (let [context (:context env)]
     (if (or name finally)
       (do
-        (when (= :expr context) (emits "(function (){"))
-        (emits "try{")
-        (let [{:keys [statements ret]} try]
-          (emit-block subcontext statements ret))
-        (emits "}")
+        (when (= :expr context)
+          (emits "(function (){"))
+        (emits "try{" try "}")
         (when name
-          (emits "catch (" (munge name) "){")
-          (when catch
-            (let [{:keys [statements ret]} catch]
-              (emit-block subcontext statements ret)))
-          (emits "}"))
+          (emits "catch (" (munge name) "){" catch "}"))
         (when finally
-          (let [{:keys [statements ret]} finally]
-            (assert (not= :constant (:op ret)) "finally block cannot contain constant")
-            (emits "finally {")
-            (emit-block subcontext statements ret)
-            (emits "}")))
-        (when (= :expr context) (emits "})()")))
-      (let [{:keys [statements ret]} try]
-        (when (and statements (= :expr context)) (emits "(function (){"))
-        (emit-block subcontext statements ret)
-        (when (and statements (= :expr context)) (emits "})()"))))))
+          (assert (not= :constant (:op finally)) "finally block cannot contain constant")
+          (emits "finally {" finally "}"))
+        (when (= :expr context)
+          (emits "})()")))
+      (emits try))))
 
 (defmethod emit :let
   [{:keys [bindings statements ret env loop]}]
