@@ -1004,6 +1004,10 @@ reduces them without incurring seq initialization"
   "Returns true if x is the value true, false otherwise."
   [x] (cljs.core/true? x))
 
+(defn ^boolean exists?
+  "Return true if object exists, false otherwise."
+  [x] (not= "undefined" (goog/typeOf x)))
+
 (defn ^boolean undefined? [x]
   (cljs.core/undefined? x))
 
