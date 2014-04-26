@@ -66,9 +66,15 @@
     (catch js/Error e
       (not (re-find #"EOF while reading" (.-message e))))))
   
-(defn init []
-  ;; Bootstrap an empty version of the cljs.user namespace
-  (swap! comp/*emitted-provides* conj (symbol "cljs.user"))
-  (.provide js/goog "cljs.user")
-  (set! cljs.core/*ns-sym* (symbol "cljs.user")))
-   
+(defn init
+  ([]
+    ;; Bootstrap an empty version of the cljs.user namespace
+    (swap! comp/*emitted-provides* conj (symbol "cljs.user"))
+    (.provide js/goog "cljs.user")
+    (set! cljs.core/*ns-sym* (symbol "cljs.user")))
+  ([ns]
+    ;; Bootstrap an empty version of the cljs.user namespace
+    (swap! comp/*emitted-provides* conj (symbol "cljs.user"))
+    (.provide js/goog "cljs.user")
+    (set! cljs.analyzer/*cljs-ns* (symbol ns))
+    (set! cljs.core/*ns-sym* (symbol ns)))) 
