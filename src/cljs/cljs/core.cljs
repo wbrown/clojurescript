@@ -6941,6 +6941,19 @@ reduces them without incurring seq initialization"
   [d]
   (-realized? d))
 
+(defn clj->js
+  "Recursively transforms ClojureScript maps into Javascript objects,
+   other ClojureScript colls into JavaScript arrays, and ClojureScript
+   keywords into JavaScript strings."
+  [x]
+  (cond
+    (string? x) x
+    (keyword? x) (name x)
+    (map? x) (.-strobj (reduce (fn [m [k v]]
+                                 (assoc m (clj->js k) (clj->js v))) {} x))
+    (coll? x) (apply js/Array (map clj->js x))
+    :else x))
+
 (defn js->clj
   "Recursively transforms JavaScript arrays into ClojureScript
   vectors, and JavaScript objects into ClojureScript maps.  With
