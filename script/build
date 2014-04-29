@@ -20,17 +20,26 @@ POM_TEMPLATE="pom.template.xml"
 # where 856 is the number of commits since the v0.0 tag. It will always
 # find the v0.0 tag and will always return the total number of commits (even
 # if the tag is v0.0.1).
-REVISION=`git --no-replace-objects describe --match v0.0`
+REVISION=`git --no-replace-objects describe --match v0.0` || true
 
-# Extract the version number from the string. Do this in two steps so
-# it is a little easier to understand.
-REVISION=${REVISION:5} # drop the first 5 characters
-REVISION=${REVISION:0:${#REVISION}-9} # drop the last 9 characters
+# check if we've gotten a revision, if not, we're not official so let's set
+# our revision to the abbreviated sha1 of the commit
+if [ -z "$REVISION"]
+then
+    REVISION=`git log --format="%H" -n 1`
+    REVISION=${REVISION:1:5}
+    #REVISION=`git rev-list HEAD --count`;
+else
+    # Extract the version number from the string. Do this in two steps so
+    # it is a little easier to understand.
+    REVISION=${REVISION:5} # drop the first 5 characters
+    REVISION=${REVISION:0:${#REVISION}-9} # drop the last 9 characters
+fi
 
 TAG=r$REVISION
 
-POM_FILE="$WORKING/clojurescript-0.0-$REVISION.pom"
-JAR_FILE="$WORKING/clojurescript-0.0-$REVISION.jar"
+POM_FILE="$WORKING/clojurescript-$REVISION.pom"
+JAR_FILE="$WORKING/clojurescript-$REVISION.jar"
 
 
 # `jar cf` errors on duplicate entries,
@@ -44,7 +53,7 @@ jar cf "$JAR_FILE" -C "$WORKING/jar_contents" .
 
 sed -e s/CLOJURESCRIPT_VERSION/0.0-$REVISION/ < "$POM_TEMPLATE" > "$POM_FILE"
 
-mvn install:install-file -Dfile="$JAR_FILE" -DpomFile="$POM_FILE"
+mvn deploy:deploy-file -Durl=file:"../m2-local" -Dfile="$JAR_FILE" -DpomFile="$POM_FILE" 
 
 # For Hudson server
 if [ "$HUDSON" = "true" ]; then
