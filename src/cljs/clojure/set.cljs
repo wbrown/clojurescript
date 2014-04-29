@@ -6,9 +6,7 @@
 ;   the terms of this license.
 ;   You must not remove this notice, or any other, from this software.
 
-(ns ^{:doc "Set operations such as union/intersection."
-       :author "Rich Hickey"}
-       clojure.set)
+(ns clojure.set)
 
 (defn- bubble-max-key [k coll]
   "Move a maximal element of coll according to fn k (which returns a number) 
@@ -141,22 +139,22 @@
   (and (>= (count set1) (count set2))
        (every? #(contains? set1 %) set2)))
 
-(comment
-(refer 'set)
-(def xs #{{:a 11 :b 1 :c 1 :d 4}
-         {:a 2 :b 12 :c 2 :d 6}
-         {:a 3 :b 3 :c 3 :d 8 :f 42}})
-
-(def ys #{{:a 11 :b 11 :c 11 :e 5}
-         {:a 12 :b 11 :c 12 :e 3}
-         {:a 3 :b 3 :c 3 :e 7 }})
-
-(join xs ys)
-(join xs (rename ys {:b :yb :c :yc}) {:a :a})
-
-(union #{:a :b :c} #{:c :d :e })
-(difference #{:a :b :c} #{:c :d :e})
-(intersection #{:a :b :c} #{:c :d :e})
-
-(index ys [:b]))
+;(comment
+;(refer 'set)
+;(def xs #{{:a 11 :b 1 :c 1 :d 4}
+;         {:a 2 :b 12 :c 2 :d 6}
+;         {:a 3 :b 3 :c 3 :d 8 :f 42}})
+;
+;(def ys #{{:a 11 :b 11 :c 11 :e 5}
+;         {:a 12 :b 11 :c 12 :e 3}
+;         {:a 3 :b 3 :c 3 :e 7 }})
+;
+;(join xs ys)
+;(join xs (rename ys {:b :yb :c :yc}) {:a :a})
+;
+;(union #{:a :b :c} #{:c :d :e })
+;(difference #{:a :b :c} #{:c :d :e})
+;(intersection #{:a :b :c} #{:c :d :e})
+;
+;(index ys [:b]))
 
