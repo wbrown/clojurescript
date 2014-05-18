@@ -28,7 +28,7 @@
   "Process a single block of JavaScript received from the server"
   [conn block]
   (let [result (try {:status :success :value (str (js* "eval(~{block})"))}
-                    (catch js/Error e
+                    (catch :default e
                       {:status :exception :value (pr-str e)
                        :stacktrace (if (.hasOwnProperty e "stack")
                                      (.-stack e)
@@ -68,7 +68,7 @@
                       (net/transmit
                        repl-connection
                        :evaluate-javascript
-                       (.getResponseText e/currentTarget
+                       (.getResponseText (.-currentTarget e)
                                          ()))))
 
       (net/register-service repl-connection

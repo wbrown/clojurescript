@@ -4,7 +4,7 @@ rm -rf out
 mkdir -p out
 
 #bin/cljsc benchmark > out/core-benchmark.js
-bin/cljsc benchmark "{:optimizations :advanced}" >out/core-advanced-benchmark.js
+bin/cljsc benchmark "{:optimizations :advanced :output-wrapper true}" >out/core-advanced-benchmark.js
 
 if [ "$V8_HOME" = "" ]; then
   echo "V8_HOME not set, skipping V8 benchmarks"
@@ -19,7 +19,7 @@ if [ "$SPIDERMONKEY_HOME" = "" ]; then
   echo "SPIDERMONKEY_HOME not set, skipping SpiderMonkey benchmarks"
 else
   echo "Benchmarking with SpiderMonkey"
-  "${SPIDERMONKEY_HOME}/js" -m -n -a -f out/core-advanced-benchmark.js
+  "${SPIDERMONKEY_HOME}/js" -m -a -f out/core-advanced-benchmark.js
 fi
 
 if [ "$JSC_HOME" = "" ]; then
@@ -27,4 +27,11 @@ if [ "$JSC_HOME" = "" ]; then
 else
   echo "Benchmarking with JavaScriptCore"
   "${JSC_HOME}/jsc" -f out/core-advanced-benchmark.js
+fi
+
+if [ "$NASHORN_HOME" = "" ]; then
+  echo "NASHORN_HOME not set, skipping Nashorn benchmarks"
+else
+  echo "Benchmarking with Nashorn"
+  "${NASHORN_HOME}/jjs" out/core-advanced-benchmark.js
 fi

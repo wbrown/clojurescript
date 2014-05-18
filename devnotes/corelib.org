@@ -55,7 +55,7 @@ does what?
 * accessor
 * DONE aclone
 * add-classpath
-* add-watch
+* DONE add-watch
 * agent
 * agent-error
 * agent-errors
@@ -109,30 +109,30 @@ does what?
 * DONE bit-xor
 * DONE boolean
 * boolean-array
-* booleans
+* DONE booleans
 * bound-fn
 * bound-fn*
 * bound?
 * DONE butlast
-* TODO byte
+* DONE byte
 * byte-array
-* bytes
+* DONE bytes
 * DONE case
 * cast
-* char
+* DONE char
 * char-array
 * char-escape-string
 * char-name-string
 * char?
-* chars
-* chunk
-* chunk-append
-* chunk-buffer
-* chunk-cons
-* chunk-first
-* chunk-next
-* chunk-rest
-* chunked-seq?
+* DONE chars
+* DONE chunk
+* DONE chunk-append
+* DONE chunk-buffer
+* DONE chunk-cons
+* DONE chunk-first
+* DONE chunk-next
+* DONE chunk-rest
+* DONE chunked-seq?
 * class
 * class?
 * clear-agent-errors
@@ -141,7 +141,7 @@ does what?
 * DONE comment
 * commute
 * DONE comp
-* TODO comparator
+* DONE comparator
 * DONE compare
 * DONE compare-and-set!
 * compile
@@ -197,9 +197,9 @@ For macros only, uses clojure.core version
 * dosync
 * DONE dotimes
 * DONE doto
-* TODO double
+* DONE double
 * DONE double-array
-* TODO doubles
+* DONE doubles
 * DONE drop
 * DONE drop-last
 * DONE drop-while
@@ -232,10 +232,10 @@ macro currently expands into extend call
 * find-var
 * DONE first
 * DONE flatten
-* float
+* DONE float
 * float-array
 * float?
-* floats
+* DONE floats
 * flush
 * DONE fn
 * DONE fn?
@@ -243,7 +243,7 @@ macro currently expands into extend call
 * DONE fnil
 * DONE for
 * DONE force
-* format
+* DONE format
 * DONE frequencies
 * future
 * future-call
@@ -264,7 +264,7 @@ macro currently expands into extend call
 * DONE hash
 * DONE hash-combine
 * DONE hash-map
-* TODO hash-set
+* DONE hash-set
 * DONE identical?
 * DONE identity
 * DONE if-let
@@ -278,14 +278,14 @@ macro currently expands into extend call
 * DONE instance?
 does what?
 * DONE int
-* int-array
+* DONE int-array
 * DONE integer?
 * DONE interleave
 * intern
 * DONE interpose
 * DONE into
 * DONE into-array
-* ints
+* DONE ints
 * io!
 * DONE isa?
 does what?
@@ -299,11 +299,10 @@ does what?
 * DONE keyword
 * DONE keyword?
 * DONE last
-* TODO lazy-cat
+* DONE lazy-cat
 * DONE lazy-seq
 * DONE let
 * DONE letfn
-** TODO needs compiler letfn*
 * line-seq
 * DONE list
 * DONE list*
@@ -316,7 +315,7 @@ does what?
 * locking
 * DONE long
 * DONE long-array
-* TODO longs
+* DONE longs
 * DONE loop
 * macroexpand
 * macroexpand-1
@@ -439,7 +438,7 @@ dunno about regex
 * refer
 * refer-clojure
 * DONE reify
-* TODO specify - make a particular object extend a protocol
+* DONE specify - make a particular object extend a protocol
 * release-pending-sends
 * DONE rem
 * DONE remove
@@ -472,29 +471,29 @@ as macro
 * DONE seq
 * DONE seq?
 * seque
-* TODO sequence
+* DONE sequence
 * DONE sequential?
 * DONE set
 * set-error-handler!
 * set-error-mode!
-* set-validator!
+* DONE set-validator!
 * DONE set?
-* short
+* DONE short
 * short-array
-* shorts
-* TODO shuffle
+* DONE shorts
+* DONE shuffle
 * shutdown-agents
 * slurp
 * DONE some
 * DONE some-fn
 * DONE sort
 * DONE sort-by
-* TODO sorted-map
-* TODO sorted-map-by
-* TODO sorted-set
-* TODO sorted-set-by
-* TODO sorted?
-* TODO special-symbol?
+* DONE sorted-map
+* DONE sorted-map-by
+* DONE sorted-set
+* DONE sorted-set-by
+* DONE sorted?
+* DONE special-symbol?
 * spit
 * DONE split-at
 * DONE split-with
@@ -503,7 +502,7 @@ as macro
 * struct
 * struct-map
 * DONE subs
-* TODO subseq
+* DONE subseq
 * DONE subvec
 * TODO supers
 * DONE swap!
@@ -525,27 +524,27 @@ as macro
 * DONE tree-seq
 * DONE true?
 * DONE type - returns JS constructor
-* TODO unchecked-add
-* TODO unchecked-add-int
-* TODO unchecked-byte
-* TODO unchecked-char
-* TODO unchecked-dec
-* TODO unchecked-dec-int
-* TODO unchecked-divide-int
-* TODO unchecked-double
-* TODO unchecked-float
-* TODO unchecked-inc
-* TODO unchecked-inc-int
-* TODO unchecked-int
-* TODO unchecked-long
-* TODO unchecked-multiply
-* TODO unchecked-multiply-int
-* TODO unchecked-negate
-* TODO unchecked-negate-int
-* TODO unchecked-remainder-int
-* TODO unchecked-short
-* TODO unchecked-subtract
-* TODO unchecked-subtract-int
+* DONE unchecked-add
+* DONE unchecked-add-int
+* DONE unchecked-byte
+* DONE unchecked-char
+* DONE unchecked-dec
+* DONE unchecked-dec-int
+* DONE unchecked-divide-int
+* DONE unchecked-double
+* DONE unchecked-float
+* DONE unchecked-inc
+* DONE unchecked-inc-int
+* DONE unchecked-int
+* DONE unchecked-long
+* DONE unchecked-multiply
+* DONE unchecked-multiply-int
+* DONE unchecked-negate
+* DONE unchecked-negate-int
+* DONE unchecked-remainder-int
+* DONE unchecked-short
+* DONE unchecked-subtract
+* DONE unchecked-subtract-int
 * DONE underive
 * unquote
 * unquote-splicing

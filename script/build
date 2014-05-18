@@ -7,11 +7,8 @@ set -ex
 
 cd `dirname $0`/..
 
-DATE=`date '+%Y%m%d%H%M%S'`
-WORKING="clojurescript_release_$DATE"
-mkdir "$WORKING"
-
 POM_TEMPLATE="pom.template.xml"
+POM_FILE="pom.xml"
 
 # The command `git describe --match v0.0` will return a string like
 #
@@ -29,31 +26,25 @@ REVISION=${REVISION:0:${#REVISION}-9} # drop the last 9 characters
 
 TAG=r$REVISION
 
-POM_FILE="$WORKING/clojurescript-0.0-$REVISION.pom"
-JAR_FILE="$WORKING/clojurescript-0.0-$REVISION.jar"
-
-
-# `jar cf` errors on duplicate entries,
-# so we have to assemble the directory manually
-mkdir "$WORKING/jar_contents"
-
-cp -R epl-v10.html src/clj/cljs src/cljs/cljs src/cljs/clojure \
-    "$WORKING/jar_contents"
-
-jar cf "$JAR_FILE" -C "$WORKING/jar_contents" .
-
 sed -e s/CLOJURESCRIPT_VERSION/0.0-$REVISION/ < "$POM_TEMPLATE" > "$POM_FILE"
 
-mvn install:install-file -Dfile="$JAR_FILE" -DpomFile="$POM_FILE"
+COMP_FILE=`mktemp /tmp/compiler.clj.XXXXXXXXXXX`
+sed -e 's/^.def ^:dynamic \*clojurescript-version\*.*$/(def ^:dynamic *clojurescript-version* {:major 0, :minor 0, :qualifier '"$REVISION"'})/' src/clj/cljs/compiler.clj > $COMP_FILE
+mv $COMP_FILE src/clj/cljs/compiler.clj
+
+CLJS_FILE=`mktemp /tmp/core.cljs.XXXXXXXXXXX`
+sed -e 's/^.def \*clojurescript-version\*.*$/(def *clojurescript-version* '\""0.0-$REVISION"\"')/' src/cljs/cljs/core.cljs > $CLJS_FILE
+mv $CLJS_FILE src/cljs/cljs/core.cljs
 
 # For Hudson server
 if [ "$HUDSON" = "true" ]; then
+    mvn --fail-at-end -Psonatype-oss-release \
+        clean deploy nexus-staging:release
+
     echo "Creating tag $TAG"
     git tag -f "$TAG"
     git push origin "$TAG"
-
-    mvn gpg:sign-and-deploy-file -Durl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DrepositoryId=sonatype-nexus-staging -DpomFile="$POM_FILE" -Dfile="$JAR_FILE"
-    mvn nexus:staging-close nexus:staging-release -DtargetRepositoryId=releases -Dnexus.promote.autoSelectOverride=true
 else
-    echo "Skipping Maven deployment and Git push because we are not on Hudson."
+    echo "Skipping remote deployment and Git tag because we are not on Hudson."
+    mvn clean install
 fi

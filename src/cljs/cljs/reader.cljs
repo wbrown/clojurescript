@@ -14,22 +14,20 @@
 nil if the end of stream has been reached")
   (unread [reader ch] "Push back a single character on to the stream"))
 
-; Using two atoms is less idomatic, but saves the repeat overhead of map creation
-(deftype StringPushbackReader [s index-atom buffer-atom]
+(deftype StringPushbackReader [s buffer ^:mutable idx]
   PushbackReader
   (read-char [reader]
-             (if (empty? @buffer-atom)
-               (let [idx @index-atom]
-                 (swap! index-atom inc)
-                 (aget s idx))
-               (let [buf @buffer-atom]
-                 (swap! buffer-atom rest)
-                 (first buf))))
-  (unread [reader ch] (swap! buffer-atom #(cons ch %))))
+    (if (zero? (alength buffer))
+      (do
+        (set! idx (inc idx))
+        (aget s idx))
+      (.pop buffer)))
+  (unread [reader ch]
+    (.push buffer ch)))
 
 (defn push-back-reader [s]
   "Creates a StringPushbackReader from a given string"
-  (StringPushbackReader. s (atom 0) (atom nil)))
+  (StringPushbackReader. s (array) -1))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; predicates
@@ -92,54 +90,14 @@ nil if the end of stream has been reached")
   [reader _]
   (loop []
     (let [ch (read-char reader)]
-      (if (or (identical? ch \n) (identical? ch \r) (nil? ch))
+      (if (or (identical? ch \newline) (identical? ch \return) (nil? ch))
         reader
         (recur)))))
 
-(def int-pattern (re-pattern "([-+]?)(?:(0)|([1-9][0-9]*)|0[xX]([0-9A-Fa-f]+)|0([0-7]+)|([1-9][0-9]?)[rR]([0-9A-Za-z]+)|0[0-9]+)(N)?"))
-(def ratio-pattern (re-pattern "([-+]?[0-9]+)/([0-9]+)"))
-(def float-pattern (re-pattern "([-+]?[0-9]+(\\.[0-9]*)?([eE][-+]?[0-9]+)?)(M)?"))
-(def symbol-pattern (re-pattern "[:]?([^0-9/].*/)?([^0-9/][^/]*)"))
-
-(defn- re-find*
-  [re s]
-  (let [matches (.exec re s)]
-    (when-not (nil? matches)
-      (if (== (alength matches) 1)
-        (aget matches 0)
-        matches))))
-
-(defn- match-int
-  [s]
-  (let [groups (re-find* int-pattern s)
-        group3 (aget groups 2)]
-    (if-not (or (nil? group3)
-                (< (alength group3) 1))
-      0
-      (let [negate (if (identical? "-" (aget groups 1)) -1 1)
-            a (cond
-               (aget groups 3) (array (aget groups 3) 10)
-               (aget groups 4) (array (aget groups 4) 16)
-               (aget groups 5) (array (aget groups 5) 8)
-               (aget groups 7) (array (aget groups 7) (js/parseInt (aget groups 7)))
-               :default (array nil nil))
-            n (aget a 0)
-            radix (aget a 1)]
-        (if (nil? n)
-          nil
-          (* negate (js/parseInt n radix)))))))
-
-
-(defn- match-ratio
-  [s]
-  (let [groups (re-find* ratio-pattern s)
-        numinator (aget groups 1)
-        denominator (aget groups 2)]
-    (/ (js/parseInt numinator) (js/parseInt denominator))))
-
-(defn- match-float
-  [s]
-  (js/parseFloat s))
+(def int-pattern (re-pattern "^([-+]?)(?:(0)|([1-9][0-9]*)|0[xX]([0-9A-Fa-f]+)|0([0-7]+)|([1-9][0-9]?)[rR]([0-9A-Za-z]+))(N)?$"))
+(def ratio-pattern (re-pattern "^([-+]?[0-9]+)/([0-9]+)$"))
+(def float-pattern (re-pattern "^([-+]?[0-9]+(\\.[0-9]*)?([eE][-+]?[0-9]+)?)(M)?$"))
+(def symbol-pattern (re-pattern "^[:]?([^0-9/].*/)?([^0-9/][^/]*)$"))
 
 (defn- re-matches*
   [re s]
@@ -149,6 +107,38 @@ nil if the end of stream has been reached")
       (if (== (alength matches) 1)
         (aget matches 0)
         matches))))
+
+(defn- match-int
+  [s]
+  (let [groups (re-matches* int-pattern s)
+        zero (aget groups 2)]
+    (if-not (nil? zero)
+      0
+      (let [a (cond
+               (aget groups 3) (array (aget groups 3) 10)
+               (aget groups 4) (array (aget groups 4) 16)
+               (aget groups 5) (array (aget groups 5) 8)
+               (aget groups 6) (array (aget groups 7)
+                                      (js/parseInt (aget groups 6) 10))
+               :else (array nil nil))
+            n (aget a 0)
+            radix (aget a 1)]
+        (when-not (nil? n)
+          (let [parsed (js/parseInt n radix)]
+            (if (identical? "-" (aget groups 1))
+              (- parsed)
+              parsed)))))))
+
+(defn- match-ratio
+  [s]
+  (let [groups (re-matches* ratio-pattern s)
+        numinator (aget groups 1)
+        denominator (aget groups 2)]
+    (/ (js/parseInt numinator 10) (js/parseInt denominator 10))))
+
+(defn- match-float
+  [s]
+  (js/parseFloat s))
 
 (defn- match-number
   [s]
@@ -186,8 +176,8 @@ nil if the end of stream has been reached")
       (read-char reader)
       (read-char reader))))
 
-(def unicode-2-pattern (re-pattern "[0-9A-Fa-f]{2}"))
-(def unicode-4-pattern (re-pattern "[0-9A-Fa-f]{4}"))
+(def unicode-2-pattern (re-pattern "^[0-9A-Fa-f]{2}$"))
+(def unicode-4-pattern (re-pattern "^[0-9A-Fa-f]{4}$"))
 
 (defn validate-unicode-escape [unicode-pattern reader escape-char unicode-str]
   (if (re-matches unicode-pattern unicode-str)
@@ -385,7 +375,7 @@ nil if the end of stream has been reached")
   (cond
    (identical? c \") read-string*
    (identical? c \:) read-keyword
-   (identical? c \;) not-implemented ;; never hit this
+   (identical? c \;) read-comment
    (identical? c \') (wrapping-reader 'quote)
    (identical? c \@) (wrapping-reader 'deref)
    (identical? c \^) read-meta
@@ -398,7 +388,6 @@ nil if the end of stream has been reached")
    (identical? c \{) read-map
    (identical? c \}) read-unmatched-delimiter
    (identical? c \\) read-char
-   (identical? c \%) not-implemented
    (identical? c \#) read-dispatch
    :else nil))
 
@@ -435,17 +424,17 @@ nil if the end of stream has been reached")
   "Reads one object from the string s"
   [s]
   (let [r (push-back-reader s)]
-    (read r true nil false)))
+    (read r false nil false)))
 
 
 ;; read instances
 
-(defn ^:private zero-fill-right [s width]
+(defn ^:private zero-fill-right-and-truncate [s width]
   (cond (= width (count s)) s
-        (< width (count s)) (.substring s 0 width)
+        (< width (count s)) (subs s 0 width)
         :else (loop [b (gstring/StringBuffer. s)]
                 (if (< (.getLength b) width)
-                  (recur (.append b \0))
+                  (recur (.append b "0"))
                   (.toString b)))))
 
 (defn ^:private divisible?
@@ -468,31 +457,42 @@ nil if the end of stream has been reached")
     (fn [month leap-year?]
       (get (if leap-year? dim-leap dim-norm) month))))
 
-(def ^:private parse-and-validate-timestamp
-  (let [timestamp #"(\d\d\d\d)(?:-(\d\d)(?:-(\d\d)(?:[T](\d\d)(?::(\d\d)(?::(\d\d)(?:[.](\d+))?)?)?)?)?)?(?:[Z]|([-+])(\d\d):(\d\d))?"
-        check (fn [low n high msg]
-                (assert (<= low n high) (str msg " Failed:  " low "<=" n "<=" high))
-                n)]
-    (fn [ts]
-      (when-let [[[_ years months days hours minutes seconds milliseconds] [_ _ _] :as V]
-                 (->> ts
-                      (re-matches timestamp)
-                      (split-at 8)
-                      (map vec))]
-        (let [[[_ y mo d h m s ms] [offset-sign offset-hours offset-minutes]]
-              (->> V
-                   (map #(update-in %2 [0] %)
-                        [(constantly nil) #(if (= % "-") "-1" "1")])
-                   (map (fn [v] (map #(js/parseInt % 10) v))))
-              offset (* offset-sign (+ (* offset-hours 60) offset-minutes))]
-          [(if-not years 1970 y)
-           (if-not months 1        (check 1 mo 12 "timestamp month field must be in range 1..12"))
-           (if-not days 1          (check 1 d (days-in-month mo (leap-year? y)) "timestamp day field must be in range 1..last day in month"))
-           (if-not hours 0         (check 0 h 23 "timestamp hour field must be in range 0..23"))
-           (if-not minutes 0       (check 0 m 59 "timestamp minute field must be in range 0..59"))
-           (if-not seconds 0       (check 0 s (if (= m 59) 60 59) "timestamp second field must be in range 0..60"))
-           (if-not milliseconds 0  (check 0 ms 999 "timestamp millisecond field must be in range 0..999"))
-           offset])))))
+(def ^:private timestamp-regex #"(\d\d\d\d)(?:-(\d\d)(?:-(\d\d)(?:[T](\d\d)(?::(\d\d)(?::(\d\d)(?:[.](\d+))?)?)?)?)?)?(?:[Z]|([-+])(\d\d):(\d\d))?")
+
+(defn ^:private parse-int [s]
+  (let [n (js/parseInt s 10)]
+    (if-not (js/isNaN n)
+      n)))
+
+(defn ^:private check [low n high msg]
+  (when-not (<= low n high)
+    (reader-error nil (str msg " Failed:  " low "<=" n "<=" high))) 
+  n)
+
+(defn parse-and-validate-timestamp [s]
+  (let [[_ years months days hours minutes seconds fraction offset-sign offset-hours offset-minutes :as v] 
+        (re-matches timestamp-regex s)]
+    (if-not v
+      (reader-error nil (str "Unrecognized date/time syntax: " s))
+      (let [years (parse-int years)
+            months (or (parse-int months) 1)
+            days (or (parse-int days) 1)
+            hours (or (parse-int hours) 0)
+            minutes (or (parse-int minutes) 0)
+            seconds (or (parse-int seconds) 0)
+            fraction (or (parse-int (zero-fill-right-and-truncate fraction 3)) 0)
+            offset-sign (if (= offset-sign "-") -1 1)
+            offset-hours (or (parse-int offset-hours) 0)
+            offset-minutes (or (parse-int offset-minutes) 0)
+            offset (* offset-sign (+ (* offset-hours 60) offset-minutes))]
+        [years
+         (check 1 months 12 "timestamp month field must be in range 1..12")
+         (check 1 days (days-in-month months (leap-year? years)) "timestamp day field must be in range 1..last day in month")
+         (check 0 hours 23 "timestamp hour field must be in range 0..23")
+         (check 0 minutes 59 "timestamp minute field must be in range 0..59")
+         (check 0 seconds (if (= minutes 59) 60 59) "timestamp second field must be in range 0..60")
+         (check 0 fraction 999 "timestamp millisecond field must be in range 0..999")
+         offset]))))
 
 (defn parse-timestamp
   [ts]
@@ -513,8 +513,29 @@ nil if the end of stream has been reached")
 (defn ^:private read-queue
   [elems]
   (if (vector? elems)
-    (into cljs.core.PersistentQueue/EMPTY elems)
+    (into cljs.core.PersistentQueue.EMPTY elems)
     (reader-error nil "Queue literal expects a vector for its elements.")))
+
+
+(defn ^:private read-js
+  [form]
+  (cond
+    (vector? form)
+    (let [arr (array)]
+      (doseq [x form]
+        (.push arr x))
+      arr)
+
+    (map? form)
+    (let [obj (js-obj)]
+      (doseq [[k v] form]
+        (aset obj (name k) v))
+      obj)
+    
+    :else
+    (reader-error nil
+      (str "JS literal expects a vector or map containing "
+           "only string or unqualified keyword keys"))))
 
 
 (defn ^:private read-uuid
@@ -525,27 +546,46 @@ nil if the end of stream has been reached")
 
 (def *tag-table* (atom {"inst"  read-date
                         "uuid"  read-uuid
-                        "queue" read-queue}))
+                        "queue" read-queue
+                        "js"    read-js}))
+
+(def *default-data-reader-fn*
+  (atom nil))
 
 (defn maybe-read-tagged-type
   [rdr initch]
-  (let [tag  (read-symbol rdr initch)]
-    (if-let [pfn (get @*tag-table* (name tag))]
-      (pfn (read rdr true nil false))
-      (reader-error rdr
-                    "Could not find tag parser for " (name tag)
-                    " in " (pr-str (keys @*tag-table*))))))
+  (let [tag (read-symbol rdr initch)
+        pfn (get @*tag-table* (str tag))
+        dfn @*default-data-reader-fn*]
+    (cond
+     pfn (pfn (read rdr true nil false))
+     dfn (dfn tag (read rdr true nil false))
+     :else (reader-error rdr
+                         "Could not find tag parser for " (str tag)
+                         " in " (pr-str (keys @*tag-table*))))))
 
 (defn register-tag-parser!
   [tag f]
-  (let [tag (name tag)
+  (let [tag (str tag)
         old-parser (get @*tag-table* tag)]
     (swap! *tag-table* assoc tag f)
     old-parser))
 
 (defn deregister-tag-parser!
   [tag]
-  (let [tag (name tag)
+  (let [tag (str tag)
         old-parser (get @*tag-table* tag)]
     (swap! *tag-table* dissoc tag)
+    old-parser))
+
+(defn register-default-tag-parser!
+  [f]
+  (let [old-parser @*default-data-reader-fn*]
+    (swap! *default-data-reader-fn* (fn [_] f))
+    old-parser))
+
+(defn deregister-default-tag-parser!
+  []
+  (let [old-parser @*default-data-reader-fn*]
+    (swap! *default-data-reader-fn* (fn [_] nil))
     old-parser))
